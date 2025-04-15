@@ -2,16 +2,30 @@
   "name": "fakecheck",
   "version": "v1.0",
   "description": "API that analyzes news content and verifies its veracity using AI.",
+  "contact": "ericshantos13@gmail.com",
+  "code_repository": "https://github.com/CheckFake/CheckFake",
+  "technologies": [
+    "Node.js", 
+    "Express", 
+    "TensorFlow", 
+    "Keras", 
+    "Pickle", 
+    "Spacy", 
+    "Sklearn", 
+    "Cheerio", 
+    "Axios"
+  ],
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "jest"
   },
   "keywords": [
-    "fake news"
+    "fake news",
+    "deep learning"
   ],
-  "author": "Eric Santos <https://www.github.com/ericshantos>",
-  "license": "ISC",
+  "author": "Eric Santos",
+  "license": "MIT",
   "dependencies": {
     "@tensorflow/tfjs-node": "^4.22.0",
     "axios": "^1.8.4",
