@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  node:
+    build:
+      context: ./api/gateway
+    container_name: fakecheck_gateway
+    volumes:
+      - ./api/gateway:/src
+    depends_on:
+      - python
+    networks:
+      - fakecheck_network
+
+  python:
+    build:
+      context: ./api/nlp_predictor
+    container_name: fakecheck_nlp_predictor
+    volumes:
+      - ./api:/nlp_predictor
+    command: python -m spacy download pt_core_news_sm
+    networks:
+      - fakecheck_network
+
+networks:
+  fakecheck_network:
+    driver: bridge
