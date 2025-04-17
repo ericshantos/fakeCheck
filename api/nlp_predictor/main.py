@@ -1,42 +1,44 @@
 # -*- coding: utf-8 -*-
 """
 @Author  : Eric dos Santos (ericshantos13@gmail.com)
-Main module for running the fake news prediction pipeline.
+Main module for running the fake news prediction pipeline over network connections.
 """
 
-import json
-import sys
-import traceback
-from pipeline import TextCleaner, ModelLoader, Predictor
-from config import TOKENIZER_PATH, MODEL_PATH
+import socket
+from src import predict_fake_news
 
-def main():
+HOST = '0.0.0.0'  # IP address to listen on all interfaces
+PORT = 9000        # Port on which the server will listen for incoming connections
+
+def start_server() -> None:
     """
-    Entry point for the prediction pipeline.
+    Starts the TCP server and listens for incoming connections.
 
-    Reads input JSON from stdin containing a "text" field,
-    preprocesses the text, loads model and tokenizer, performs prediction,
-    and prints the result as JSON to stdout.
+    This function sets up a server that listens on the specified port. When a connection
+    is made, it receives the news article, runs the prediction pipeline, and returns the
+    result to the client.
 
-    On error, prints the traceback to stderr and exits with code 1.
+    It runs continuously, accepting and processing requests until manually terminated.
     """
-    try:
-        input_data = sys.stdin.read()
-        data = json.loads(input_data)
-        text = data["text"]
-
-        cleaner = TextCleaner()
-        model_loader = ModelLoader(MODEL_PATH, TOKENIZER_PATH)
-        predictor = Predictor(model_loader.model, model_loader.tokenizer)
-
-        cleaned = cleaner.clean(text)
-        result = predictor.predict(cleaned)
-
-        print(json.dumps({"result": result}))
-
-    except Exception as e:
-        traceback.print_exc(file=sys.stderr)
-        sys.exit(1)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((HOST, PORT))  # Bind the server to the host and port
+        s.listen()            # Enable the server to listen for incoming connections
+        print(f"Listening on port {PORT}")
+        
+        while True:
+            conn, _ = s.accept()  # Accept a new connection
+            with conn:
+                data = conn.recv(4096).decode('utf-8')  # Receive data from the client
+                
+                # If no data is received, continue to the next iteration
+                if not data:
+                    continue
+                
+                # Process the received data through the fake news prediction pipeline
+                result = predict_fake_news(data)
+                
+                # Send the prediction result back to the client
+                conn.sendall(str(result).encode('utf-8'))
 
 if __name__ == "__main__":
-    main()
+    start_server()

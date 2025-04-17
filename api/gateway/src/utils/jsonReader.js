@@ -8,10 +8,12 @@ import PathHelper from './pathManager.js';
  */
 const readJson = async (filePath) => {
   try {
-    const data = await readFile(PathHelper.pathFromRoot(filePath), 'utf-8');
+    const fullPath = PathHelper.pathFromRoot(filePath);
+    console.log(`Attempting to read JSON from: ${fullPath}`);
+    const data = await readFile(fullPath, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
-    console.error(`Failed to read or parse JSON from ${filePath}:`, error.message);
+    console.error(`Failed to read or parse JSON from ${filePath}:`, error);
     return {};
   }
 };

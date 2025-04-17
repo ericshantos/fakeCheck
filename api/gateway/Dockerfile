@@ -1,13 +1,13 @@
-FROM node:16
+FROM node:20
 
-WORKDIR /src
+WORKDIR /app
 
 COPY package*.json ./
 
 RUN npm install
 
+RUN mkdir -p /app/metadatas
+
 COPY . .
 
-EXPOSE 3000
-
-CMD [ "npm", "start" ]
+CMD ["npm", "start"]

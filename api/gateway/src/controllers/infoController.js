@@ -14,14 +14,7 @@ const infoController = async (req, res) => {
   try {
     const info = await infoService();
 
-    return res.status(200).json({
-      model_version: info.modelVersion,
-      api_version: info.apiVersion,
-      last_update: info.lastUpdate,
-      framework: info.framework,
-      model_architecture: info.modelArchitecture,
-      license: info.license
-    });
+    return res.status(200).json(info);
   } catch (error) {
     console.error('Error fetching info:', error);
 

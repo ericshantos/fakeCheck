@@ -1,54 +1,71 @@
-import { spawn } from 'child_process';
-import PathHelper from './pathManager.js';
+import net from "net";
 
 /**
- * Processes a given text string using a Python script.
- *
- * The text is sent to the Python process via stdin in JSON format,
- * and the result is expected to be returned as a JSON string with a `result` key.
- *
- * @param {string} text - The input text to be processed.
- * @returns {Promise<string>} - A promise that resolves with the processed result,
- * or rejects with an error if the process fails or returns invalid output.
+ * Class to interact with a remote prediction service over a TCP connection.
+ * Sends text data to a service and receives a prediction result.
+ * 
+ * @class PredictionRequester
  */
-export default function textProcessor(text) {
-    if (typeof text !== 'string') {
-        return Promise.reject(new Error('The "text" parameter must be a string'));
+export default class PredictionRequester {
+    constructor () {
+        // Creates a new TCP client socket for communication with the remote service
+        this.client = new net.Socket();
     }
 
-    return new Promise((resolve, reject) => {
-        const scriptPath = PathHelper.pathFromRoot("nlp_predictor/main.py");
-        const pythonProcess = spawn('python3', [scriptPath]);
+    /**
+     * Sends the provided text to a remote prediction service and retrieves a prediction.
+     * The text is sent via a TCP connection, and the service processes it to return a prediction.
+     *
+     * @param {string} text - The text to be predicted. Must be a non-empty string.
+     * 
+     * @returns {Promise<any>} A promise that resolves with the prediction result from the service.
+     * 
+     * @throws {Error} If the input is not a valid string or if there is a network error during communication.
+     * 
+     * @example
+     * const requester = new PredictionRequester();
+     * requester.predict("This is some news text.")
+     *   .then(prediction => console.log("Prediction result:", prediction))
+     *   .catch(error => console.error("Error:", error));
+     */
+    async predict(text) {
+        if (typeof text !== 'string' || text.trim().length === 0) {
+            throw new Error('The "text" parameter must be a non-empty string.');
+        }
 
-        let stdout = '';
-        let stderr = '';
-
-        pythonProcess.stdout.on('data', (data) => {
-            stdout += data.toString();
-        });
-
-        pythonProcess.stderr.on('data', (data) => {
-            stderr += data.toString();
-        });        
-
-        pythonProcess.on('close', (code) => {
-            if (code !== 0) {
-                return reject(new Error(`Python process exited with code ${code}\n${stderr.trim()}`));
-            }
-        
-            if (!stdout) {
-                return reject(new Error('No output received from Python process'));
-            }
-        
+        return new Promise((resolve, reject) => {
             try {
-                const { result } = JSON.parse(stdout);
-                resolve(result);
-            } catch (e) {
-                reject(new Error(`Failed to parse JSON output: ${e.message}`));
-            }
-        });        
+                this.client.connect(9000, 'python_service', () => {
+                    this.client.write(text);
+                });
 
-        pythonProcess.stdin.write(JSON.stringify({ text }));
-        pythonProcess.stdin.end();
-    });
-}
+                this.client.on('data', (data) => {
+                    resolve(data.toString());
+                    this.client.destroy();
+                });-
+
+                this.client.on('error', (err) => {
+                    reject(new Error(`Connection error: ${err.message}`));
+                    this.client.destroy();
+                });
+
+                this.client.setTimeout(5000, () => {
+                    reject(new Error('Prediction request timed out.'));
+                    this.client.destroy();
+                });
+
+            } catch (err) {
+                reject(new Error(`Unexpected error: ${err.message}`));
+            }
+        });
+    }
+
+    /**
+     * Closes the TCP connection if it is still open.
+     */
+    closeConnection() {
+        if (this.client && !this.client.destroyed) {
+            this.client.destroy();
+        }
+    }
+};

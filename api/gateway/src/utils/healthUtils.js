@@ -1,5 +1,6 @@
 import axios from "axios";
 import os from "os";
+import PredictionRequester from "./pythonBridge.js";
 import textProcessor from "./pythonBridge.js";
 
 /**
@@ -78,10 +79,11 @@ export const checkSystemResources = () => {
  * Returns the result of the model functionality check, including prediction output if successful.
  */
 export const checkModel = async ({
+    predictor = new PredictionRequester(),
     text = "noticia falso espalhar rapidamente rede social poder causar desinformacao larga escala"
 } = {}) => {
     try {
-        const result = await textProcessor(text);
+        const result = await predictor.predict(text);
 
         if (!result) {
             return {
@@ -93,7 +95,6 @@ export const checkModel = async ({
         return {
             status: 'success',
             message: 'Model is operational and returning predictions',
-            data: result
         };
     } catch (error) {
         return {

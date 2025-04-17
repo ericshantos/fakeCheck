@@ -19,7 +19,7 @@ import readJson from "../utils/jsonReader.js";
  * @property {string} code_repository - The URL to the project's source code repository.
  */
 const creditsService = async () => {
-    const response = await readJson('gateway/package.json') || {};
+    const response = await readJson('package.json') || {};
 
     const {
         name = 'unknown',

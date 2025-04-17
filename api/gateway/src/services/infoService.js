@@ -1,14 +1,14 @@
 import readJson from '../utils/jsonReader.js';
 
 /**
- * Gathers version and metadata information from the machine learning model and the API package.
+ * Gathers version and metadata information from the machine learning 
+ * model and the API package.
  *
  * @async
  * @function infoService
  * @returns {Promise<{
  *   apiVersion: string,
  *   modelVersion: string,
- *   lastUpdate: string,
  *   framework: string,
  *   modelArchitecture: string,
  *   license: string
@@ -21,18 +21,34 @@ import readJson from '../utils/jsonReader.js';
  * - `license`: License information related to the model.
  */
 const infoService = async () => {
-  const modelJson = await readJson('nlp_predictor/model/model_metadata.json');
-  const packageJson = await readJson('gateway/package.json');
+  const defaults = {
+    version: 'unknown',
+    framework: 'unknown',
+    model_architecture: 'unknown',
+    license: 'unknown'
+  };
 
-  const apiVersion = packageJson?.version || 'unknown';
-
-  const modelVersion = modelJson?.version || 'unknown';
-  const lastUpdate = modelJson?.training_data.last_update || 'unknown';
-  const framework = modelJson?.framework || 'unknown';
-  const modelArchitecture = modelJson?.model_architecture || 'unknown';
-  const license = modelJson?.license || 'unknown';
-
-  return { apiVersion, modelVersion, lastUpdate, framework, modelArchitecture, license };
+  try {
+    const modelJson = await readJson('metadatas/model_metadata.json') || {};
+    const packageJson = await readJson('package.json') || {};
+    
+    return {
+      api_version: packageJson.version || defaults.version,
+      model_version: modelJson.version || defaults.version,
+      framework: modelJson.framework || defaults.framework,
+      model_architecture: modelJson.model_architecture || defaults.model_architecture,
+      license: modelJson.license || defaults.license
+    };
+  } catch (error) {
+    console.error('Error in infoService:', error);
+    return {
+      api_version: defaults.version,
+      model_version: defaults.version,
+      framework: defaults.framework,
+      model_architecture: defaults.model_architecture,
+      license: defaults.license
+    };
+  }
 };
 
 export default infoService;

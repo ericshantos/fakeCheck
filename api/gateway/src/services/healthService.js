@@ -20,7 +20,7 @@ import {
  *     internet: { status: string, message: string },
  *     scraper: { status: string, message: string },
  *     systemResources: { status: string, message: string },
- *     model: { status: string, message: string, data?: any }
+ *     model: { status: string, message: string }
  *   }
  * }>} Consolidated health status and details of each check.
  */
