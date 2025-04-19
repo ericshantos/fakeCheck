@@ -1,13 +1,10 @@
-FROM node:20
-
+FROM node:20 AS builder
 WORKDIR /app
-
 COPY package*.json ./
+RUN npm ci --only=production
 
-RUN npm install
-
-RUN mkdir -p /app/metadatas
-
+FROM node:20-slim
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
 COPY . .
-
 CMD ["npm", "start"]

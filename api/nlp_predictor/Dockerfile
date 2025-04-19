@@ -1,7 +1,5 @@
-FROM python:3.10-slim
-
+FROM python:3.10-slim as builder
 WORKDIR /app
-
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
@@ -10,13 +8,13 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     python3-dev \
     && rm -rf /var/lib/apt/lists/*
-
 COPY requirements.txt .
+RUN pip install --user -r requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-RUN python -m spacy download pt_core_news_sm
-
+FROM python:3.10-slim
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
 COPY . .
-
-CMD ["sh", "-c", "pip install -r requirements.txt && python3 main.py"]
+RUN python -m spacy download pt_core_news_sm
+ENV PATH=/root/.local/bin:$PATH
+CMD ["python", "main.py"]
