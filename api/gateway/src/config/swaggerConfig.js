@@ -5,7 +5,7 @@ const swaggerOptions = {
     swaggerDefinition: {
         info: {
             title: 'FakeCheck API',
-            version: '1.2.0',
+            version: '2.2.0',
             description: 'API for fake news detection and system information',
             contact: {
                 name: 'API Support',
@@ -16,6 +16,9 @@ const swaggerOptions = {
             "/check": {
                 post: {
                     summary: "Verifies the authenticity of a news article based on the provided URL",
+                    description: "⚠️ Rate limit: 50 requests per 15 minutes per IP (except 127.0.0.1).",
+                    "x-rateLimit-limit": 50,
+                    "x-rateLimit-windowMs": 15 * 60 * 1000,
                     requestBody: {
                         required: true,
                         content: {
@@ -56,12 +59,9 @@ const swaggerOptions = {
                                 }
                             }
                         },
-                        '400': {
-                            description: "Invalid URL"
-                        },
-                        '500': {
-                            description: "Internal server error while processing the news"
-                        }
+                        '400': { description: "Invalid URL" },
+                        '429': { description: "Too many requests - rate limit exceeded" },
+                        '500': { description: "Internal server error while processing the news" }
                     }
                 }
             },
@@ -76,44 +76,27 @@ const swaggerOptions = {
                                     schema: {
                                         type: "object",
                                         properties: {
-                                            api_version: {
-                                                type: "string",
-                                                description: "The version of the API"
-                                            },
-                                            model_version: {
-                                                type: "string",
-                                                description: "The version of the machine learning model"
-                                            },
-                                            last_update: {
-                                                type: "string",
-                                                description: "The date of the last model data update"
-                                            },
-                                            framework: {
-                                                type: "string",
-                                                description: "Machine learning framework used in the model (e.g., TensorFlow, PyTorch)"
-                                            },
-                                            model_architecture: {
-                                                type: "string",
-                                                description: "Architecture of the model (e.g., LSTM, BERT)"
-                                            },
-                                            license: {
-                                                type: "string",
-                                                description: "The model's license"
-                                            }
+                                            api_version: { type: "string" },
+                                            model_version: { type: "string" },
+                                            last_update: { type: "string" },
+                                            framework: { type: "string" },
+                                            model_architecture: { type: "string" },
+                                            license: { type: "string" }
                                         }
                                     }
                                 }
                             }
                         },
-                        '500': {
-                            description: "Error retrieving information"
-                        }
+                        '500': { description: "Error retrieving information" }
                     }
                 }
             },
             "/health": {
                 get: {
                     summary: "Performs a system health check, including connectivity, scraper, and model status",
+                    description: "⚠️ Rate limit: 10 requests per minute per IP.",
+                    "x-rateLimit-limit": 10,
+                    "x-rateLimit-windowMs": 60 * 1000,
                     responses: {
                         '200': {
                             description: "Healthy system status",
@@ -124,7 +107,6 @@ const swaggerOptions = {
                                         properties: {
                                             status: {
                                                 type: "string",
-                                                description: "Overall system health status",
                                                 enum: ["healthy", "unhealthy"]
                                             },
                                             checks: {
@@ -133,53 +115,29 @@ const swaggerOptions = {
                                                     internet: {
                                                         type: "object",
                                                         properties: {
-                                                            status: {
-                                                                type: "string",
-                                                                description: "Internet connectivity status"
-                                                            },
-                                                            message: {
-                                                                type: "string",
-                                                                description: "Message related to connectivity"
-                                                            }
+                                                            status: { type: "string" },
+                                                            message: { type: "string" }
                                                         }
                                                     },
                                                     scraper: {
                                                         type: "object",
                                                         properties: {
-                                                            status: {
-                                                                type: "string",
-                                                                description: "Scraper status"
-                                                            },
-                                                            message: {
-                                                                type: "string",
-                                                                description: "Message related to the scraper"
-                                                            }
+                                                            status: { type: "string" },
+                                                            message: { type: "string" }
                                                         }
                                                     },
                                                     systemResources: {
                                                         type: "object",
                                                         properties: {
-                                                            status: {
-                                                                type: "string",
-                                                                description: "System resources status"
-                                                            },
-                                                            message: {
-                                                                type: "string",
-                                                                description: "Message about system resources"
-                                                            }
+                                                            status: { type: "string" },
+                                                            message: { type: "string" }
                                                         }
                                                     },
                                                     model: {
                                                         type: "object",
                                                         properties: {
-                                                            status: {
-                                                                type: "string",
-                                                                description: "Machine learning model status"
-                                                            },
-                                                            message: {
-                                                                type: "string",
-                                                                description: "Message about the model"
-                                                            }
+                                                            status: { type: "string" },
+                                                            message: { type: "string" }
                                                         }
                                                     }
                                                 }
@@ -189,12 +147,9 @@ const swaggerOptions = {
                                 }
                             }
                         },
-                        '503': {
-                            description: "Service unavailable"
-                        },
-                        '500': {
-                            description: "Error performing the health check"
-                        }
+                        '429': { description: "Too many requests - rate limit exceeded" },
+                        '503': { description: "Service unavailable" },
+                        '500': { description: "Error performing the health check" }
                     }
                 }
             },
@@ -209,45 +164,22 @@ const swaggerOptions = {
                                     schema: {
                                         type: "object",
                                         properties: {
-                                            project: {
-                                                type: "string",
-                                                description: "Project name"
-                                            },
-                                            description: {
-                                                type: "string",
-                                                description: "Project description"
-                                            },
-                                            author: {
-                                                type: "string",
-                                                description: "Project author"
-                                            },
-                                            contact: {
-                                                type: "string",
-                                                description: "Author's contact information"
-                                            },
-                                            license: {
-                                                type: "string",
-                                                description: "Project license"
-                                            },
+                                            project: { type: "string" },
+                                            description: { type: "string" },
+                                            author: { type: "string" },
+                                            contact: { type: "string" },
+                                            license: { type: "string" },
                                             technologies: {
                                                 type: "array",
-                                                items: {
-                                                    type: "string"
-                                                },
-                                                description: "Technologies used in the project"
+                                                items: { type: "string" }
                                             },
-                                            code_repository: {
-                                                type: "string",
-                                                description: "URL of the project's code repository"
-                                            }
+                                            code_repository: { type: "string" }
                                         }
                                     }
                                 }
                             }
                         },
-                        '500': {
-                            description: "Error retrieving project credits"
-                        }
+                        '500': { description: "Error retrieving project credits" }
                     }
                 }
             }

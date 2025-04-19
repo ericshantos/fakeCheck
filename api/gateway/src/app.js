@@ -1,46 +1,59 @@
 import express from "express";
 import router from "./routes/index.js";
-import swaggerConfig from "./config/swaggerConfig.js";  // Importação estática
+import swaggerConfig from "./config/swaggerConfig.js";
+import { createLimiter } from "./middlewares/rateLimits.js";
 
 const app = express();
 
 /**
  * Express application instance.
  * 
- * This module sets up and configures the Express application, applying necessary
- * middleware and mounting the route handlers. It serves as the main entry point
- * for the application server.
+ * This module initializes and configures the Express application, 
+ * applies global middleware, integrates API documentation via Swagger, 
+ * and mounts route handlers. It serves as the main entry point for the server.
  * 
  * @module app
  */
 
 /**
- * Configures Swagger documentation for the API.
+ * Integrates Swagger API documentation.
  * 
- * This integrates Swagger configuration into the Express app to enable interactive API documentation.
- * 
+ * Applies Swagger configuration to the Express app, enabling
+ * interactive documentation for all defined routes and endpoints.
+ *
  * @function
  * @memberof module:app
  */
 swaggerConfig(app);
 
 /**
- * Middleware to parse incoming JSON requests.
+ * Parses incoming JSON requests.
  * 
- * This middleware automatically parses the incoming JSON request body 
- * and makes it available in `req.body` for subsequent route handlers.
- * 
+ * Attaches middleware that parses JSON payloads in incoming requests
+ * and makes them available in `req.body`.
+ *
  * @function
  * @memberof module:app
  */
 app.use(express.json());
 
 /**
- * Mounts the router on the root path ("/").
+ * Applies rate limiting middleware.
  * 
- * All incoming requests are passed through the router, which is configured 
- * in the `index.js` file located in the routes directory.
+ * This middleware helps protect the API from abuse by limiting 
+ * the number of requests a client can make within a defined window.
  * 
+ * @function
+ * @memberof module:app
+ */
+app.use(createLimiter());
+
+/**
+ * Mounts the application routes.
+ * 
+ * All incoming HTTP requests to the root path ("/") are forwarded
+ * to the main router, which handles the defined endpoints.
+ *
  * @function
  * @memberof module:app
  */
@@ -49,8 +62,8 @@ app.use("/", router);
 /**
  * Exports the configured Express application.
  * 
- * This allows other modules or files to use this Express instance, 
- * typically to start the server or to be used in testing setups.
+ * This export allows the app to be used in server initialization,
+ * testing setups, or integration with other modules.
  * 
  * @exports
  * @type {express.Application}

@@ -8,6 +8,11 @@ services:
     networks:
       - fakecheck_network
   node_app:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     build:
       context: ./api/gateway/
     container_name: fakecheck_gateway
@@ -21,6 +26,9 @@ services:
       - fakecheck_network
 
   python_service:
+    healthcheck:
+      test: ["CMD", "netstat", "-tuln | grep 9000"]
+      interval: 30s
     build:
       context: ./api/nlp_predictor
     container_name: fakecheck_nlp_predictor
