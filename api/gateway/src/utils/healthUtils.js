@@ -44,28 +44,34 @@ export const checkScraper = async () => {
 };
 
 /**
- * Evaluates system memory resources to determine if sufficient memory is available.
+ * Evaluates system memory and CPU load to determine if sufficient resources are available.
+ * 
+ * This function checks the system's free memory and CPU load average to assess the overall system resource status. 
+ * If memory is low (below 500 MB), it returns an error. If CPU load is high (over 70% of the available CPUs), 
+ * it returns a warning.
  *
  * @function
- * @returns {{ status: 'success' | 'error', message: string }}
- * Returns the result of the system resource (memory) availability check.
+ * @returns {{ status: 'success' | 'error' | 'warning', message: string, metrics: { freeMemory: number, loadAvg: number } }}
+ * - status: The result of the resource check (success, error, or warning).
+ * - message: A descriptive message about the resource status.
+ * - metrics: An object containing the system's free memory (in MB) and load average.
  */
 export const checkSystemResources = () => {
-    const freeMemory = os.freemem();
-    const totalMemory = os.totalmem();
-    const memoryUsage = freeMemory / totalMemory;
-
-    if (memoryUsage < 0.1) {
-        return {
-            status: 'error',
-            message: 'Insufficient system memory available'
-        };
+    const freeMemory = os.freemem() / 1024 / 1024; // In MB
+    const loadAvg = os.loadavg()[0];
+  
+    let status = 'success';
+    let message = 'System resources OK';
+  
+    if (freeMemory < 500) {
+      status = 'error';
+      message = `Low memory: ${freeMemory.toFixed(2)} MB free`;
+    } else if (loadAvg > os.cpus().length * 0.7) { 
+      status = 'warning';
+      message = `High CPU load: ${loadAvg.toFixed(2)}`;
     }
-
-    return {
-        status: 'success',
-        message: 'System resources are sufficient'
-    };
+  
+    return { status, message, metrics: { freeMemory, loadAvg } };
 };
 
 /**

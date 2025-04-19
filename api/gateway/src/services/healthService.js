@@ -25,13 +25,12 @@ import {
  * }>} Consolidated health status and details of each check.
  */
 const healthService = async () => {
-    const [internet, scraper, model] = await Promise.all([
+    const [internet, scraper, model, systemResources] = await Promise.all([
         checkInternetConnection(),
         checkScraper(),
+        checkSystemResources(),
         checkModel()
     ]);
-
-    const systemResources = checkSystemResources();
 
     const allChecks = {
         internet,

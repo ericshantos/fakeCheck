@@ -4,11 +4,15 @@
 Main module for running the fake news prediction pipeline over network connections.
 """
 
-import socket
+import socket, os
 from src import predict_fake_news
+from dotenv import load_dotenv
 
-HOST = '0.0.0.0'  # IP address to listen on all interfaces
-PORT = 9000        # Port on which the server will listen for incoming connections
+load_dotenv()
+
+HOST = os.environ.get('HOST', '0.0.0.0')
+PORT = int(os.environ.get('PORT', 8080))
+
 
 def start_server() -> None:
     """

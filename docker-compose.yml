@@ -25,7 +25,7 @@ services:
       context: ./api/nlp_predictor
     container_name: fakecheck_nlp_predictor
     ports:
-      - "9000:9000" 
+      - "9000:9000"
     networks:
       - fakecheck_network
 
@@ -35,4 +35,3 @@ networks:
   
 volumes:
   redis_data:
-  
