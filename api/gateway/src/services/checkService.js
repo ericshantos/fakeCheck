@@ -1,30 +1,42 @@
+import { createClient } from "redis";
 import NewFetcher from "./../utils/newFetcher.js";
 import TextExtractor from "../utils/TextExtractor.js";
 import PredictionRequester from "../utils/pythonBridge.js";
 
 const DEFAULT_THRESHOLD = 0.7;
 
+const redisClient = createClient({ url: 'redis://redis:6379' }); 
+await redisClient.connect();
+
 /**
- * Verifies the authenticity of a news article by fetching its content, 
- * extracting the text, and analyzing it with a machine learning model. 
- * It determines whether the article is real or fake based on a confidence score.
- *
- * @param {string} url - The URL of the news article to verify.
- * @param {Object} [options] - Optional configuration for customization or testing.
- * @param {Function} [options.fetch=fetchNews] - Custom function to fetch the HTML content of the news article. Defaults to `new NewFetcher()`.
- * @param {TextExtractor} [options.extractor=new TextExtractor()] - Custom instance of the text extractor. Defaults to `new TextExtractor()`.
- * @param {PredictionRequester} [options.predictor=new PredictionRequester()] - Custom instance of the prediction requester. Defaults to `new PredictionRequester()`.
- * @param {Date} [options.now=new Date()] - Custom timestamp for when the extraction is performed. Defaults to the current date and time.
- *
- * @returns {Promise<{ title: string, content: string, veracity: "real" | "fake", confidence: number, threshold: number, extracted_at: string }>} 
- * An object containing the article's veracity label ("real" or "fake"), the confidence score (rounded to two decimal places), 
- * the threshold used for classification, and the timestamp of when the extraction occurred.
+ * Verifies the authenticity of a news article by processing its content through
+ * a machine learning model and returns the analysis results.
  * 
- * @throws {Error} If any error occurs during the fetching, extracting, or predicting process.
+ * @param {string} url - The URL of the news article to verify. Must be a valid HTTP/HTTPS URL.
+ * @param {Object} [options] - Optional configuration for customization or testing.
+ * @param {NewFetcher} [options.fetchNews=new NewFetcher()] - Custom news fetcher instance. Default uses NewFetcher.
+ * @param {TextExtractor} [options.extractor=new TextExtractor()] - Custom text extractor instance. Default uses TextExtractor.
+ * @param {PredictionRequester} [options.predictor=new PredictionRequester()] - Custom ML predictor instance. Default uses PredictionRequester.
+ * @param {Date} [options.now=new Date()] - Custom timestamp for the extraction. Defaults to current datetime.
+ * 
+ * @returns {Promise<Object>} Result object containing:
+ * @returns {string} .title - Article title (if available)
+ * @returns {string} .content - Extracted article content
+ * @returns {"real"|"fake"} .veracity - Classification result
+ * @returns {number} .confidence - Model's confidence score (0-1)
+ * @returns {number} .threshold - Threshold used for classification
+ * @returns {string} .extracted_at - ISO timestamp of when analysis was performed
+ * 
+ * @throws {Error} If any of these occur:
+ * - Invalid URL or failed fetch
+ * - Unable to extract article content
+ * - Prediction service failure
+ * - Redis cache operation failure
  * 
  * @example
- * const result = await checkService('https://example.com/article');
- * console.log(result); // { veracity: "real", confidence: 0.85, threshold: 0.7, extracted_at: "2025-04-16T00:00:00.000Z" }
+ * // Basic usage
+ * const result = await checkService('https://example.com/news-article');
+ * 
  */
 const checkService = async (
   url,
@@ -35,6 +47,11 @@ const checkService = async (
     now = new Date()
   } = {}
 ) => {
+  const cachedResult = await redisClient.get(url);
+  if (cachedResult) {
+    return JSON.parse(cachedResult);
+  }
+
   try {
     // Fetch and extract the HTML content of the news article
     const html = await fetchNews.fetch(url);
@@ -46,17 +63,17 @@ const checkService = async (
 
     // Process the article text with the Python ML model
     const predictionScore = await predictor.predict(content.articleText);
-    console.log("Processor result:", predictionScore);
 
-    const label = predictionScore > DEFAULT_THRESHOLD ? "real" : "fake";
-
-    return {
-      veracity: label,
+    const features = {
+      veracity: predictionScore > DEFAULT_THRESHOLD ? "real" : "fake",
       confidence: Math.round(predictionScore * 100) / 100,
       threshold: DEFAULT_THRESHOLD,
       extracted_at: now.toISOString()
     };
 
+    await redisClient.setEx(url, 3600, JSON.stringify(features))
+
+    return features
   } catch (error) {
     console.error("Error verifying news article:", error.message);
     throw new Error("Failed to process the news content.");
