@@ -176,7 +176,7 @@ MANIFEST
 *.manifest
 *.spec
 
-.package-lock.json
+package-lock.json
 
 # Installer logs
 pip-log.txt
