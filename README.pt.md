@@ -7,6 +7,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.19-orange.svg)
 ![Docker & Docker Compose](https://img.shields.io/badge/Docker_&_Compose-enabled-2496ED?logo=docker&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Cached-red.svg)
 
 Uma API RESTful para detecção de fake news em português utilizando deep learning, construída com Express.js e Python.
 
@@ -21,40 +22,43 @@ Uma API RESTful para detecção de fake news em português utilizando deep learn
     - [Arquitetura](#arquitetura)
     - [Dados de Treinamento](#dados-de-treinamento)
     - [Métricas de Desempenho](#métricas-de-desempenho)
-    - [Diferenciais](#diferenciais)
+    - [Recursos Chave](#recursos-chave)
   - [Documentação da API](#documentação-da-api)
     - [Endpoints](#endpoints)
   - [Instalação](#instalação)
     - [Pré-requisitos](#pré-requisitos)
     - [Configuração](#configuração)
-  - [Uso](#uso)
-    - [Desenvolvimento](#desenvolvimento)
   - [Contribuindo](#contribuindo)
   - [Licença](#licença)
   - [Agradecimentos](#agradecimentos)
 
 ## Problema
 
-As fake news se tornaram um grande problema social, espalhando desinformação rapidamente por canais digitais. A falta de ferramentas confiáveis para verificar automaticamente a veracidade das notícias em português agrava ainda mais esse cenário, especialmente no ecossistema midiático brasileiro.
+Fake news se tornaram um problema social significativo, espalhando desinformação rapidamente por canais digitais. A falta de ferramentas confiáveis para verificar automaticamente a autenticidade de notícias em português agrava esse problema, especialmente no ecossistema midiático brasileiro.
 
 ## Solução
 
-O FakeCheck fornece uma API que:
-1. Extrai o texto de uma notícia via URL  
-2. Processa o conteúdo com técnicas de PLN  
-3. Classifica a notícia como "real" ou "falsa" utilizando um modelo LSTM treinado  
+O FakeCheck oferece uma API que:
+1. Extrai texto de artigos de notícias via URL  
+2. Processa o conteúdo usando técnicas de PLN (Processamento de Linguagem Natural)  
+3. Classifica o artigo como “real” ou “falso” usando um modelo LSTM personalizado  
 4. Retorna uma pontuação de confiança junto com a previsão  
+5. Implementa cache com Redis para melhor desempenho  
+6. Fornece monitoramento abrangente da saúde do sistema  
 
 O modelo atinge 95% de acurácia em conjuntos de dados de notícias em português.
 
 ## Funcionalidades
 
-- **Verificação de Notícias**: Endpoint POST para verificar a veracidade de uma notícia  
-- **Status do Sistema**: Endpoint GET para monitoramento do serviço  
-- **Informações do Modelo**: Endpoint GET para detalhes sobre versão e arquitetura  
-- **Metadados do Projeto**: Endpoint GET com créditos e stack tecnológico  
-- **Containerizado**: Pronto para deploy com Docker Compose  
-- **Escalável**: Arquitetura de microsserviços com serviços separados em Node.js e Python
+- **Verificação de Notícias**: Endpoint POST para verificar autenticidade de notícias com cache Redis (TTL de 1 hora)  
+- **Saúde do Sistema**: Endpoint GET para monitoramento de serviço com controle de taxa  
+- **Informações do Modelo**: Endpoint GET com detalhes da versão e arquitetura  
+- **Metadados do Projeto**: Endpoint GET com créditos e tecnologias utilizadas  
+- **Containerizado**: Pronto para implantação com Docker Compose (Node.js, Python, Redis)  
+- **Escalável**: Arquitetura de microsserviços com serviços separados  
+- **Rate Limiting**: Proteção contra abusos com limites configuráveis  
+- **Log Completo**: Registro detalhado de requisições e rastreamento de erros  
+- **Documentação Swagger**: Documentação interativa da API disponível em `/docs`
 
 ## Arquitetura Técnica
 
@@ -63,17 +67,21 @@ O modelo atinge 95% de acurácia em conjuntos de dados de notícias em portuguê
 │   ├── Rotas
 │   ├── Controladores
 │   ├── Serviços
-│   └── Utilitários
+│   ├── Middlewares (Rate limiting, Logs)
+│   └── Utils (Extração de texto, ponte com Python)
 │
-└── Previsor NLP (Python)
-    ├── Modelo LSTM (TensorFlow/Keras)
-    ├── Pré-processamento de Texto
-    └── Servidor Socket
+├── Previsor NLP (Python)
+│   ├── Modelo LSTM (TensorFlow/Keras)
+│   ├── Pré-processamento de Texto (spaCy)
+│   └── Servidor via socket
+│
+└── Cache Redis
+    └── Previsões armazenadas (TTL de 1 hora)
 ```
 
 ## Detalhes do Modelo
 
-O modelo de aprendizado de máquina que alimenta esta API foi desenvolvido e treinado por mim (Eric Santos) como parte do projeto [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector).
+O modelo principal de machine learning que alimenta esta API foi desenvolvido e treinado por mim (Eric Santos) como parte do projeto [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector).
 
 ### Arquitetura
 ```
@@ -82,41 +90,44 @@ Camada Densa (64 unidades, ReLU) → Camada de Saída (1 unidade, Sigmoid)
 ```
 
 ### Dados de Treinamento
-- Fonte: [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus)  
-- Amostras: 7.200 notícias (50% reais, 50% falsas)  
-- Divisão treino/teste: 80/20  
+- Fonte: [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus)
+- Amostras: 7.200 artigos de notícias (50% reais, 50% falsos)
+- Divisão treino/teste: 80/20
 
 ### Métricas de Desempenho
-| Métrica    | Valor |
-|------------|-------|
-| Acurácia   | 95%   |
-| Precisão   | 96%   |
-| Recall     | 94%   |
-| F1-Score   | 95%   |
-| ROC AUC    | 96%   |
+| Métrica     | Valor |
+|-------------|-------|
+| Acurácia    | 95%   |
+| Precisão    | 96%   |
+| Recall      | 94%   |
+| F1-Score    | 95%   |
+| ROC AUC     | 96%   |
 
-### Diferenciais
-- Tokenizador personalizado otimizado para o português brasileiro  
+### Recursos Chave
+- Tokenizador personalizado otimizado para português brasileiro  
 - Tratamento especial para vocabulário jornalístico  
-- Limiar adaptativo (padrão: 0.7 de confiança)
+- Limiar adaptativo (padrão: 0.7 de confiança)  
+- Cache com Redis para melhorar o desempenho  
+- Verificações de saúde completas
 
 ## Documentação da API
 
-A documentação interativa da API é gerada automaticamente com Swagger UI e está disponível no endpoint `/docs` quando o serviço está em execução. A documentação inclui:
+A documentação interativa da API é gerada automaticamente usando Swagger UI e está disponível no endpoint `/docs` quando o serviço está em execução. A documentação inclui:
 
-- Descrições detalhadas dos endpoints  
+- Descrição detalhada dos endpoints  
 - Exemplos de requisições e respostas  
 - Especificações de parâmetros  
 - Códigos de erro  
+- Informações sobre limites de requisição  
 
 ### Endpoints
 
-| Método | Endpoint   | Descrição                       | Parâmetros                     |
-|--------|------------|----------------------------------|--------------------------------|
-| POST   | /check     | Verifica veracidade da notícia  | `{ "url": "string" }`         |
-| GET    | /info      | Obtém metadados do modelo       | -                              |
-| GET    | /health    | Diagnóstico do sistema          | -                              |
-| GET    | /credits   | Informações do projeto          | -                              |
+| Método | Endpoint  | Descrição                        | Parâmetros            | Limite         |
+|--------|-----------|----------------------------------|------------------------|----------------|
+| POST   | /check    | Verifica autenticidade da notícia | `{ "url": "string" }` | 50/15min       |
+| GET    | /info     | Metadados do modelo              | -                      | 100/15min      |
+| GET    | /health   | Diagnóstico do sistema           | -                      | 10/1min        |
+| GET    | /credits  | Informações do projeto           | -                      | 100/15min      |
 
 Exemplo de Requisição:
 ```bash
@@ -155,37 +166,22 @@ docker-compose up --build
 
 A API estará disponível em `http://localhost:3000`
 
-## Uso
-
-### Desenvolvimento
-Para rodar em modo de desenvolvimento com recarregamento automático:
-
-```bash
-# No diretório do gateway
-npm install
-npm start
-
-# Em outro terminal para o serviço Python
-cd api/nlp_predictor
-pip install -r requirements.txt
-python main.py
-```
-
 ## Contribuindo
 
 Contribuições são bem-vindas! Siga os passos abaixo:
 1. Faça um fork do repositório  
-2. Crie uma branch de funcionalidade (`git checkout -b feature/sua-funcionalidade`)  
-3. Faça seus commits (`git commit -am 'Adiciona nova funcionalidade'`)  
-4. Suba sua branch (`git push origin feature/sua-funcionalidade`)  
-5. Abra um Pull Request  
+2. Crie um branch de funcionalidade (`git checkout -b feature/sua-funcionalidade`)  
+3. Faça o commit das suas alterações (`git commit -am 'Adicionar nova funcionalidade'`)  
+4. Faça o push para o branch (`git push origin feature/sua-funcionalidade`)  
+5. Abra um Pull Request
 
 ## Licença
 
-Este projeto está licenciado sob a Licença MIT – veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## Agradecimentos
 - [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus) pelos dados de treinamento  
-- [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector) – O modelo LSTM desenvolvido por mim (Eric Santos) especificamente para este projeto  
-- Programadores do Futuro pelo suporte educacional  
-- TensorFlow/Keras pelo framework de deep learning
+- [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector) - Modelo LSTM desenvolvido por mim (Eric Santos) especialmente para este projeto  
+- Programadores do Futuro pelo apoio educacional  
+- TensorFlow/Keras pelo framework de deep learning  
+- Redis pela implementação de cache

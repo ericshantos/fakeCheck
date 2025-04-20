@@ -7,6 +7,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.19-orange.svg)
 ![Docker & Docker Compose](https://img.shields.io/badge/Docker_&_Compose-enabled-2496ED?logo=docker&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Cached-red.svg)
 
 A RESTful API for detecting fake news in Portuguese using deep learning, built with Express.js and Python.
 
@@ -27,8 +28,6 @@ A RESTful API for detecting fake news in Portuguese using deep learning, built w
   - [Installation](#installation)
     - [Prerequisites](#prerequisites)
     - [Setup](#setup)
-  - [Usage](#usage)
-    - [Development](#development)
   - [Contributing](#contributing)
   - [License](#license)
   - [Acknowledgments](#acknowledgments)
@@ -44,17 +43,22 @@ FakeCheck provides an API that:
 2. Processes the content using NLP techniques
 3. Classifies the article as "real" or "fake" using a custom-trained LSTM model
 4. Returns a confidence score with the prediction
+5. Implements Redis caching for improved performance
+6. Provides comprehensive health monitoring
 
 The model achieves 95% accuracy on Portuguese-language news datasets.
 
 ## Features
 
-- **News Verification**: POST endpoint to check news authenticity
-- **System Health**: GET endpoint for service monitoring
+- **News Verification**: POST endpoint to check news authenticity with Redis caching (1-hour TTL)
+- **System Health**: GET endpoint for service monitoring with rate limiting
 - **Model Information**: GET endpoint for version and architecture details
 - **Project Metadata**: GET endpoint with credits and technology stack
-- **Containerized**: Ready for deployment with Docker Compose
-- **Scalable**: Microservice architecture with separate Node.js and Python services
+- **Containerized**: Ready for deployment with Docker Compose (Node.js, Python, Redis)
+- **Scalable**: Microservice architecture with separate services
+- **Rate Limiting**: Protection against abuse with configurable limits
+- **Comprehensive Logging**: Detailed request logging and error tracking
+- **Swagger Documentation**: Interactive API documentation at `/docs` endpoint
 
 ## Technical Architecture
 
@@ -63,12 +67,16 @@ The model achieves 95% accuracy on Portuguese-language news datasets.
 │   ├── Routes
 │   ├── Controllers
 │   ├── Services
-│   └── Utils
+│   ├── Middlewares (Rate limiting, Logging)
+│   └── Utils (Text extraction, Python bridge)
 │
-└── NLP Predictor (Python)
-    ├── LSTM Model (TensorFlow/Keras)
-    ├── Text Preprocessing
-    └── Socket Server
+├── NLP Predictor (Python)
+│   ├── LSTM Model (TensorFlow/Keras)
+│   ├── Text Preprocessing (spaCy)
+│   └── Socket Server
+│
+└── Redis Cache
+    └── Cached predictions (1-hour TTL)
 ```
 
 ## Model Details
@@ -99,6 +107,8 @@ Dense Layer (64 units, ReLU) → Output Layer (1 unit, Sigmoid)
 - Custom tokenizer optimized for Brazilian Portuguese
 - Special handling for journalistic vocabulary
 - Adaptive thresholding (default: 0.7 confidence)
+- Redis caching for improved performance
+- Comprehensive health checks
 
 ## API Documentation
 
@@ -108,15 +118,16 @@ Interactive API documentation is automatically generated using Swagger UI and av
 - Example requests/responses
 - Parameter specifications
 - Error codes
+- Rate limit information
 
 ### Endpoints
 
-| Method | Endpoint | Description | Parameters |
-|--------|----------|-------------|------------|
-| POST   | /check   | Verify news authenticity | `{ "url": "string" }` |
-| GET    | /info    | Get model metadata | - |
-| GET    | /health  | System diagnostics | - |
-| GET    | /credits | Project information | - |
+| Method | Endpoint | Description | Parameters | Rate Limit |
+|--------|----------|-------------|------------|------------|
+| POST   | /check   | Verify news authenticity | `{ "url": "string" }` | 50/15min |
+| GET    | /info    | Get model metadata | - | 100/15min |
+| GET    | /health  | System diagnostics | - | 10/1min |
+| GET    | /credits | Project information | - | 100/15min |
 
 Example Request:
 ```bash
@@ -155,22 +166,6 @@ docker-compose up --build
 
 The API will be available at `http://localhost:3000`
 
-## Usage
-
-### Development
-To run in development mode with live reload:
-
-```bash
-# In the gateway directory
-npm install
-npm start
-
-# In a separate terminal for the Python service
-cd api/nlp_predictor
-pip install -r requirements.txt
-python main.py
-```
-
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
@@ -189,3 +184,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector) - The LSTM model developed by me (Eric Santos) specifically for this project
 - Programadores do Futuro for the educational support
 - TensorFlow/Keras for the deep learning framework
+- Redis for caching implementation
