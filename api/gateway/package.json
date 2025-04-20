@@ -13,7 +13,8 @@
     "Spacy",
     "Sklearn",
     "Cheerio",
-    "Axios"
+    "Axios",
+    "Redis"
   ],
   "main": "index.js",
   "type": "module",
