@@ -1,9 +1,9 @@
 import express from "express";
-import infoControllers from "../controllers/infoController.js";
-import checkController from "../controllers/checkController.js";
-import healthController from "../controllers/healthController.js";
-import creditsController from "../controllers/creditsController.js";
-import { checkLimiter, healthLimiter } from "../middlewares/rateLimits.js";
+import infoControllers from "../controllers/info.controller.js";
+import checkController from "../controllers/check.controller.js";
+import healthController from "../controllers/health.controller.js";
+import creditsController from "../controllers/credits.controller.js";
+import { checkLimiter, healthLimiter } from "../middlewares/rateLimits.middleware.js";
 
 // Create an Express router instance.
 const router = express.Router();

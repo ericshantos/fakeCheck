@@ -1,5 +1,5 @@
 import rateLimit from "express-rate-limit";
-import { RATE_LIMITS } from "../config/rateLimits.js";
+import { RATE_LIMITS } from "../config/rateLimits.config.js";
 
 /**
  * Creates a rate limiting middleware based on the provided options.

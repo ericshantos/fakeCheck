@@ -1,7 +1,7 @@
 import express from "express";
 import router from "./routes/index.js";
-import swaggerConfig from "./config/swaggerConfig.js";
-import { createLimiter } from "./middlewares/rateLimits.js";
+import swaggerConfig from "./config/swagger.config.js";
+import { createLimiter } from "./middlewares/rateLimits.middleware.js";
 
 const app = express();
 

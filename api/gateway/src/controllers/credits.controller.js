@@ -1,4 +1,4 @@
-import creditsService from "../services/creditsService.js";
+import creditsService from "../services/credits.service.js";
 
 /**
  * Controller to handle requests for project credits metadata.

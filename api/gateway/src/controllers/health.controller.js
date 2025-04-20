@@ -1,4 +1,4 @@
-import healthService from "../services/healthService.js";
+import healthService from "../services/health.service.js";
 
 /**
  * Controller responsible for handling the /health route.

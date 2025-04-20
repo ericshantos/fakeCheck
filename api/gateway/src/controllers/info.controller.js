@@ -1,4 +1,4 @@
-import infoService from '../services/infoService.js';
+import infoService from '../services/info.service.js';
 
 /**
  * Controller to handle requests for version and model information.

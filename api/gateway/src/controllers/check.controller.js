@@ -1,4 +1,4 @@
-import checkService from "../services/checkService.js";
+import checkService from "../services/check.service.js";
 
 /**
  * Controller to handle news verification requests via GET.
