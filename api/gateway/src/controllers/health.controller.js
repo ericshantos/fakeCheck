@@ -1,4 +1,5 @@
 import healthService from "../services/health.service.js";
+import { log } from "../utils/logger.js";
 
 /**
  * Controller responsible for handling the /health route.
@@ -16,8 +17,12 @@ const healthController = async (req, res) => {
 
         const httpStatus = report.status === 'healthy' ? 200 : 503;
 
+        log(`[RESULT] /health - Status: ${report.status}`, report.status === 'healthy' ? "info" : "warn");
+
         res.status(httpStatus).json(report);
     } catch (error) {
+        log(`/health - Failed to execute check: ${error.message}`, "error");
+
         res.status(500).json({
             status: 'error',
             message: 'An unexpected error occurred in healthController.',

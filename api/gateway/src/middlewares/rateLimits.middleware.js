@@ -1,5 +1,6 @@
 import rateLimit from "express-rate-limit";
 import { RATE_LIMITS } from "../config/rateLimits.config.js";
+import { log } from "../utils/logger.js";
 
 /**
  * Creates a rate limiting middleware based on the provided options.
@@ -14,7 +15,13 @@ import { RATE_LIMITS } from "../config/rateLimits.config.js";
 export const createLimiter = (options) => {
     return rateLimit({
         ...RATE_LIMITS.DEFAULT,
-        ...options
+        ...options,
+        handler: (req, res) => {
+            log(`[RATE LIMIT] Request blocked: IP ${req.ip} on route ${req.originalUrl}`, "warn");
+            res.status(429).json({
+                error: "Too many requests, please try again later."
+            });
+        }
     });
 };
 

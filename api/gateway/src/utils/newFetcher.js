@@ -1,3 +1,4 @@
+import { log } from "./logger.js";
 import axios from "axios";
 
 /**
@@ -21,16 +22,22 @@ export default class NewsFetcher {
    */
   async fetch(url) {
     try {
-      new URL(url); // Validate URL format
+      log(`Attempting to fetch news from URL: ${url}`, "info");
+
+      new URL(url);
 
       const response = await this.httpClient.get(url);
+
+      log(`Successfully fetched news from URL: ${url}`, "info");
+
       return response.data;
     } catch (error) {
-      console.error("Error fetching news:", {
-        message: error.message,
-        status: error.response?.status,
-        url
-      });
+      log(`Error fetching news from URL: ${url}`, "error");
+      log(`Error details: ${error.message}`, "error");
+
+      if (error.response) {
+        log(`Error status: ${error.response.status}`, "error");
+      }
 
       throw new Error("Unable to fetch the news content.");
     }

@@ -4,6 +4,7 @@ import {
     checkSystemResources,
     checkModel
 } from "../utils/healthUtils.js";
+import { log } from "./../utils/logger.js";
 
 /**
  * Performs a full health check of the application by running individual diagnostics:
@@ -25,6 +26,8 @@ import {
  * }>} Consolidated health status and details of each check.
  */
 const healthService = async () => {
+    log("Starting system health check...", "info");
+
     const [internet, scraper, model, systemResources] = await Promise.all([
         checkInternetConnection(),
         checkScraper(),
@@ -39,9 +42,16 @@ const healthService = async () => {
         model
     };
 
+    log(`Internet check: ${internet.status} - ${internet.message}`, internet.status === "success" ? "info" : "warn");
+    log(`Scraper check: ${scraper.status} - ${scraper.message}`, scraper.status === "success" ? "info" : "warn");
+    log(`System check: ${systemResources.status} - ${systemResources.message}`, systemResources.status === "success" ? "info" : "warn");
+    log(`Model check: ${model.status} - ${model.message}`, model.status === "success" ? "info" : "warn");
+
     const overallStatus = Object.values(allChecks).every(check => check.status === 'success')
         ? 'healthy'
         : 'unhealthy';
+
+    log(`Overall system status: ${overallStatus.toUpperCase()}`, overallStatus === "healthy" ? "info" : "error");
 
     return {
         status: overallStatus,

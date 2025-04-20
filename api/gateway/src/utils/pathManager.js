@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'url';
+import { log } from "./logger.js";
 import path from 'path';
 
 /**
@@ -40,10 +41,17 @@ export default class PathHelper {
    * // Output: /absolute/path/to/project/config/settings.json
    */
   static pathFromRoot(relativePath = '') {
-    if (typeof relativePath !== 'string') {
-      throw new TypeError('Relative path must be a string');
-    }
+    try {
+      if (typeof relativePath !== 'string') {
+        throw new TypeError('Relative path must be a string');
+      }
 
-    return path.resolve(PathHelper.ROOT_DIR, relativePath);
+      const fullPath = path.resolve(PathHelper.ROOT_DIR, relativePath);
+      log(`Resolved absolute path: ${fullPath}`, "info");
+      return fullPath;
+    } catch (error) {
+      log(`Error resolving path: ${error.message}`, "error");
+      throw error;
+    }
   }
 }

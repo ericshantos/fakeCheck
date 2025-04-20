@@ -1,4 +1,5 @@
 import * as cheerio from "cheerio";
+import { log } from "./logger.js";
 
 /**
  * Extracts structured content from raw HTML using Cheerio.
@@ -11,14 +12,18 @@ export default class TextExtractor {
    */
   extract(html) {
     if (!html || typeof html !== "string") {
+      log("Invalid HTML input.", "error");
       throw new Error("Invalid HTML input.");
     }
 
+    log("Extracting content from HTML.", "info");
+    
     const $ = cheerio.load(html);
 
     const title = this._extractTitle($);
     const articleText = this._extractArticleText($);
 
+    log("Content extraction completed.", "info");
     return { title, articleText };
   }
 
@@ -29,6 +34,11 @@ export default class TextExtractor {
    */
   _extractTitle($) {
     const titleText = $("h1").first().text().trim();
+    if (!titleText) {
+      log("Title not found in HTML.", "warn");
+    } else {
+      log(`Extracted title: ${titleText}`, "info");
+    }
     return titleText || "Title not found";
   }
 
@@ -38,10 +48,18 @@ export default class TextExtractor {
    * @returns {string}
    */
   _extractArticleText($) {
-    return $("article p")
+    const articleText = $("article p")
       .map((_, el) => $(el).text().trim())
       .get()
       .join(" ")
       .trim();
+
+    if (!articleText) {
+      log("Article text not found in HTML.", "warn");
+    } else {
+      log("Article text extracted successfully.", "info");
+    }
+
+    return articleText || "No article text found";
   }
 }

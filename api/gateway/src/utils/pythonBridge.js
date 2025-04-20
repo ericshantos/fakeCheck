@@ -1,3 +1,4 @@
+import { log } from "./logger.js";
 import net from "net";
 
 /**
@@ -30,31 +31,39 @@ export default class PredictionRequester {
      */
     async predict(text) {
         if (typeof text !== 'string' || text.trim().length === 0) {
+            log("The 'text' parameter must be a non-empty string.", "error");
             throw new Error('The "text" parameter must be a non-empty string.');
         }
 
         return new Promise((resolve, reject) => {
             try {
+                log(`Connecting to the prediction service at python_service:9000 with message: ${text}`, "info");
+
                 this.client.connect(9000, 'python_service', () => {
+                    log(`Connected to the prediction service, sending text: ${text}`, "info");
                     this.client.write(text);
                 });
 
                 this.client.on('data', (data) => {
+                    log("Received prediction from the service.", "info");
                     resolve(data.toString());
                     this.client.destroy();
-                });-
+                });
 
                 this.client.on('error', (err) => {
+                    log(`Error during connection: ${err.message}`, "error");
                     reject(new Error(`Connection error: ${err.message}`));
                     this.client.destroy();
                 });
 
                 this.client.setTimeout(5000, () => {
+                    log("Prediction request timed out.", "warn");
                     reject(new Error('Prediction request timed out.'));
                     this.client.destroy();
                 });
 
             } catch (err) {
+                log(`Unexpected error: ${err.message}`, "error");
                 reject(new Error(`Unexpected error: ${err.message}`));
             }
         });
@@ -65,6 +74,7 @@ export default class PredictionRequester {
      */
     closeConnection() {
         if (this.client && !this.client.destroyed) {
+            log("Closing the TCP connection.", "info");
             this.client.destroy();
         }
     }

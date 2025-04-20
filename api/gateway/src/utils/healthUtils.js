@@ -1,7 +1,7 @@
+import PredictionRequester from "./pythonBridge.js";
 import axios from "axios";
 import os from "os";
-import PredictionRequester from "./pythonBridge.js";
-import textProcessor from "./pythonBridge.js";
+import { log } from "./logger.js";
 
 /**
  * Checks if the application has internet access by attempting to reach Google.
@@ -16,6 +16,7 @@ export const checkInternetConnection = async () => {
         await axios.get('https://www.google.com', { timeout: 2000 });
         return { status: 'success', message: 'Internet connection established' };
     } catch (error) {
+        log(`[INTERNET CHECK] Failed to connect to the internet: ${error.message}`, "error");
         return { status: 'error', message: 'No internet connection' };
     }
 };
@@ -36,9 +37,11 @@ export const checkScraper = async () => {
         if (match) {
             return { status: 'success', message: 'Scraper working correctly' };
         } else {
+            log("[SCRAPER CHECK] Failed to extract text from HTML", "error");
             return { status: 'error', message: 'Scraper failed to extract text' };
         }
     } catch (error) {
+        log(`[SCRAPER CHECK] Unexpected error in scraper: ${error.message}`, "error");
         return { status: 'error', message: 'Unexpected error in scraper' };
     }
 };
@@ -64,11 +67,13 @@ export const checkSystemResources = () => {
     let message = 'System resources OK';
   
     if (freeMemory < 500) {
-      status = 'error';
-      message = `Low memory: ${freeMemory.toFixed(2)} MB free`;
+        status = 'error';
+        message = `Low memory: ${freeMemory.toFixed(2)} MB free`;
+        log(`[SYSTEM CHECK] Low memory: ${freeMemory.toFixed(2)} MB`, "error");
     } else if (loadAvg > os.cpus().length * 0.7) { 
-      status = 'warning';
-      message = `High CPU load: ${loadAvg.toFixed(2)}`;
+        status = 'warning';
+        message = `High CPU load: ${loadAvg.toFixed(2)}`;
+        log(`[SYSTEM CHECK] High CPU load: ${loadAvg.toFixed(2)}`, "warn");
     }
   
     return { status, message, metrics: { freeMemory, loadAvg } };
@@ -92,6 +97,7 @@ export const checkModel = async ({
         const result = await predictor.predict(text);
 
         if (!result) {
+            log("[MODEL CHECK] Model did not return a prediction", "error");
             return {
                 status: 'error',
                 message: 'Model did not return a prediction'
@@ -103,6 +109,7 @@ export const checkModel = async ({
             message: 'Model is operational and returning predictions',
         };
     } catch (error) {
+        log(`[MODEL CHECK] Error while checking model: ${error.message}`, "error");
         return {
             status: 'error',
             message: `Error checking model: ${error.message}`

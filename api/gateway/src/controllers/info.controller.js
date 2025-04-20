@@ -1,4 +1,5 @@
 import infoService from '../services/info.service.js';
+import { log } from '../utils/logger.js';
 
 /**
  * Controller to handle requests for version and model information.
@@ -14,9 +15,11 @@ const infoController = async (req, res) => {
   try {
     const info = await infoService();
 
+    log("[SUCCESS] /info - Information returned successfully", "info");
+
     return res.status(200).json(info);
   } catch (error) {
-    console.error('Error fetching info:', error);
+    log(`/info - Error fetching information: ${error.message}`, "error");
 
     return res.status(500).json({
       error: 'Internal server error',

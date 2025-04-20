@@ -1,4 +1,5 @@
 import readJson from '../utils/jsonReader.js';
+import { log } from "./../utils/logger.js";
 
 /**
  * Gathers version and metadata information from the machine learning 
@@ -21,6 +22,8 @@ import readJson from '../utils/jsonReader.js';
  * - `license`: License information related to the model.
  */
 const infoService = async () => {
+  log("Starting reading API and model information...", "info");
+
   const defaults = {
     version: 'unknown',
     framework: 'unknown',
@@ -32,6 +35,22 @@ const infoService = async () => {
     const modelJson = await readJson('metadatas/model_metadata.json') || {};
     const packageJson = await readJson('package.json') || {};
     
+    log("Reading model_metadata.json completed", "info");
+    log("Reading package.json completed", "info");
+
+    if (config.debug) {
+      log(`Contents of model_metadata.json: ${JSON.stringify(modelJson, null, 2)}`, "verbose");
+      log(`Contents of package.json: ${JSON.stringify(packageJson, null, 2)}`, "verbose");
+    }
+
+    if (!modelJson.version) {
+      log("Model version not found", "warn");
+    }
+
+    if (!packageJson.version) {
+      log("API version not found", "warn");
+    }
+
     return {
       api_version: packageJson.version || defaults.version,
       model_version: modelJson.version || defaults.version,
@@ -40,7 +59,8 @@ const infoService = async () => {
       license: modelJson.license || defaults.license
     };
   } catch (error) {
-    console.error('Error in infoService:', error);
+    log(`Error getting API/model information: ${error.message}`, "error");
+    
     return {
       api_version: defaults.version,
       model_version: defaults.version,

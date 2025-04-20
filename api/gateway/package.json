@@ -1,6 +1,6 @@
 {
   "name": "fakecheck",
-  "version": "v2.2",
+  "version": "v2.4",
   "description": "API that analyzes news content and verifies its veracity using AI.",
   "contact": "ericshantos13@gmail.com",
   "code_repository": "https://github.com/CheckFake/CheckFake",
@@ -30,6 +30,7 @@
     "@tensorflow/tfjs-node": "^4.22.0",
     "axios": "^1.8.4",
     "cheerio": "^1.0.0",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",
     "redis": "^4.7.0",
