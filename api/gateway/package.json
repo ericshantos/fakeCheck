@@ -1,6 +1,6 @@
 {
   "name": "fakecheck",
-  "version": "v2.4",
+  "version": "v2.4.1",
   "description": "API that analyzes news content and verifies its veracity using AI.",
   "contact": "ericshantos13@gmail.com",
   "code_repository": "https://github.com/CheckFake/CheckFake",

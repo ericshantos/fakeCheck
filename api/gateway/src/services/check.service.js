@@ -81,7 +81,7 @@ const checkService = async (
       veracity: predictionScore > DEFAULT_THRESHOLD ? "real" : "fake",
       confidence: Math.round(predictionScore * 100) / 100,
       threshold: DEFAULT_THRESHOLD,
-      extracted_at: now.toISOString()
+      extracted_at: now.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
     };
 
     await redisClient.setEx(url, 3600, JSON.stringify(features));
