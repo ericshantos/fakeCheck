@@ -1,5 +1,5 @@
-import infoService from '../services/info.service.js';
-import { log } from '../utils/logger.js';
+const infoService = require("@services/info.service");
+const { log } = require("@utils"); 
 
 /**
  * Controller to handle requests for version and model information.
@@ -28,4 +28,4 @@ const infoController = async (req, res) => {
   }
 };
 
-export default infoController;
+module.exports = infoController;

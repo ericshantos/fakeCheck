@@ -1,10 +1,10 @@
-import { log } from "./logger.js";
-import axios from "axios";
+const { log } = require("./logger");
+const axios = require("axios");
 
 /**
  * NewsFetcher encapsulates the HTTP client and the logic to fetch news articles.
  */
-export default class NewsFetcher {
+class NewsFetcher {
   constructor() {
     this.httpClient = axios.create({
       timeout: 10000,
@@ -43,3 +43,5 @@ export default class NewsFetcher {
     }
   }
 }
+
+module.exports = { NewsFetcher };

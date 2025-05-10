@@ -1,6 +1,6 @@
-import appConfig from "./src/config/app.config.js";
-import app from './src/app.js';
-
+require('module-alias/register');
+const config = require("@config");
+const app = require("@src/app");
 /**
  * @fileoverview Entry point for the FakeCheck API server.
  *
@@ -21,6 +21,6 @@ import app from './src/app.js';
  *
  * @function
  */
-app.listen(appConfig.port, () => 
-  console.log(`${appConfig.appName} works at port ${appConfig.port} [${appConfig.env}]`)
+app.listen(config.port, () => 
+  console.log(`${config.appName} works at port ${config.port} [${config.env}]`)
 );

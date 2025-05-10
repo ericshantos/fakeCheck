@@ -1,5 +1,5 @@
-import readJson from '../utils/jsonReader.js';
-import { log } from "./../utils/logger.js";
+const { readJson, log } = require("@utils");
+const config = require("@config");
 
 /**
  * Gathers version and metadata information from the machine learning 
@@ -32,20 +32,11 @@ const infoService = async () => {
   };
 
   try {
-    const modelJson = await readJson('metadatas/model_metadata.json') || {};
     const packageJson = await readJson('package.json') || {};
     
-    log("Reading model_metadata.json completed", "info");
     log("Reading package.json completed", "info");
 
-    if (config.debug) {
-      log(`Contents of model_metadata.json: ${JSON.stringify(modelJson, null, 2)}`, "verbose");
-      log(`Contents of package.json: ${JSON.stringify(packageJson, null, 2)}`, "verbose");
-    }
-
-    if (!modelJson.version) {
-      log("Model version not found", "warn");
-    }
+    if (config.debug) log(`Contents of package.json: ${JSON.stringify(packageJson, null, 2)}`, "verbose");
 
     if (!packageJson.version) {
       log("API version not found", "warn");
@@ -53,10 +44,10 @@ const infoService = async () => {
 
     return {
       api_version: packageJson.version || defaults.version,
-      model_version: modelJson.version || defaults.version,
-      framework: modelJson.framework || defaults.framework,
-      model_architecture: modelJson.model_architecture || defaults.model_architecture,
-      license: modelJson.license || defaults.license
+      model_version: packageJson.model_metadata.version || defaults.version,
+      framework: packageJson.model_metadata.framework || defaults.framework,
+      model_architecture: packageJson.model_metadata.model_architecture || defaults.model_architecture,
+      license: packageJson.license || defaults.license
     };
   } catch (error) {
     log(`Error getting API/model information: ${error.message}`, "error");
@@ -71,4 +62,4 @@ const infoService = async () => {
   }
 };
 
-export default infoService;
+module.exports = infoService;

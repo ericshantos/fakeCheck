@@ -1,5 +1,5 @@
-import healthService from "../services/health.service.js";
-import { log } from "../utils/logger.js";
+const healthService = require("@services/health.service");
+const { log } = require("@utils");
 
 /**
  * Controller responsible for handling the /health route.
@@ -31,4 +31,4 @@ const healthController = async (req, res) => {
     }
 };
 
-export default healthController;
+module.exports = healthController;

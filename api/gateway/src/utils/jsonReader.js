@@ -1,6 +1,6 @@
-import { readFile } from 'fs/promises';
-import PathHelper from './pathManager.js';
-import { log } from "./logger.js";
+const { PathHelper } = require("./pathManager.js");
+const { readFile } = require("fs/promises");
+const { log } =  require("./logger");
 
 /**
  * Reads and parses a JSON file from a relative path.
@@ -24,4 +24,4 @@ const readJson = async (filePath) => {
   }
 };
 
-export default readJson;
+module.exports = readJson;

@@ -1,77 +1,40 @@
-import express from "express";
-import infoControllers from "../controllers/info.controller.js";
-import checkController from "../controllers/check.controller.js";
-import healthController from "../controllers/health.controller.js";
-import creditsController from "../controllers/credits.controller.js";
-import { checkLimiter, healthLimiter } from "../middlewares/rateLimits.middleware.js";
-
-// Create an Express router instance.
-const router = express.Router();
+const checkRoute = require("./check.route");
+const creditsRoute = require("./credits.route");
+const healthRoute = require("./health.route");
+const infoRoute = require("./info.route");
 
 /**
- * POST /check
+ * Loads and mounts all API routes onto the Express application.
  * 
- * Verifies the authenticity of a news article based on a given URL.
- * Applies rate limiting middleware before executing the prediction controller.
+ * @function loadRoutes
+ * @param {express.Application} app - The Express application instance
+ * @returns {void}
  * 
- * @name POST /check
- * @function
- * @memberof module:routes/index
- * @param {express.Request} req - The request object containing the news URL.
- * @param {express.Response} res - The response object returning the model's prediction.
+ * @description
+ * Registers the following API routes:
+ * - `/check` - News verification endpoint
+ * - `/credits` - User credit management
+ * - `/health` - System health monitoring
+ * - `/info` - Service information endpoint
+ * 
+ * Each route is mounted with its own sub-router containing specific middleware
+ * and controller implementations.
+ * 
+ * @example
+ * // In your main app file:
+ * const express = require('express');
+ * const { loadRoutes } = require('@routes');
+ * 
+ * const app = express();
+ * loadRoutes(app);
+ * 
+ * app.listen(3000);
  */
-router.post("/check", checkLimiter, checkController);
+const loadRoutes = (app) => {
+    app.use("/check", checkRoute);
+    app.use("/credits", creditsRoute);
+    app.use("/health", healthRoute);
+    app.use("/info", infoRoute);
+};
 
-/**
- * GET /info
- * 
- * Returns basic API metadata, such as current version and environment.
- * 
- * @name GET /info
- * @function
- * @memberof module:routes/index
- * @param {express.Request} req - The request object.
- * @param {express.Response} res - The response object returning the API info.
- */
-router.get("/info", infoControllers);
-
-/**
- * GET /health
- * 
- * Performs a system-wide health check, including:
- * - Internet connectivity
- * - Scraper availability
- * - Model loading and readiness
- * Applies rate limiting before running the health diagnostics.
- * 
- * @name GET /health
- * @function
- * @memberof module:routes/index
- * @param {express.Request} req - The request object.
- * @param {express.Response} res - The response object with a structured health report.
- */
-router.get("/health", healthLimiter, healthController);
-
-/**
- * GET /credits
- * 
- * Fetches project metadata from the local `package.json` file. 
- * This includes project name, author, license, description, and technologies used.
- * 
- * @name GET /credits
- * @function
- * @memberof module:routes/index
- * @param {express.Request} req - The request object.
- * @param {express.Response} res - The response object containing the project metadata.
- */
-router.get("/credits", creditsController);
-
-/**
- * Exports the configured router instance.
- * 
- * This router is used by the main application module to register route handlers.
- * 
- * @exports
- * @type {express.Router}
- */
-export default router;
+module.exports = { loadRoutes };

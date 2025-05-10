@@ -1,45 +1,96 @@
-import { createClient } from "redis";
-import NewFetcher from "./../utils/newFetcher.js";
-import TextExtractor from "../utils/TextExtractor.js";
-import PredictionRequester from "../utils/pythonBridge.js";
-import { log } from "./../utils/logger.js";
-
-const DEFAULT_THRESHOLD = 0.7;
-
-const redisClient = createClient({ url: 'redis://redis:6379' }); 
-await redisClient.connect()
-  .then(() => log('Successfully connected to Redis', 'info'))
-  .catch((error) => log('Redis connection failed: ' + error.message, error));
+const { createClient } = require("redis");
+const { 
+  log,
+  NewFetcher, 
+  TextExtractor, 
+  PredictionRequester,
+} = require("@utils");
 
 /**
- * Verifies the authenticity of a news article by processing its content through
- * a machine learning model and returns the analysis results.
+ * Default confidence threshold for news classification
+ * @constant {number}
+ * @default
+ */
+const DEFAULT_THRESHOLD = 0.7;
+
+/**
+ * Redis client instance for caching results
+ * @type {import('redis').RedisClientType}
+ */
+const redisClient = createClient({ url: 'redis://redis:6379' }); 
+
+/**
+ * Tracks Redis connection status
+ * @type {boolean}
+ */
+let isRedisConnected = false;
+
+/**
+ * Ensures Redis connection is established
+ * @async
+ * @throws {Error} If connection to Redis fails
+ */
+const ensureRedisConnected = async () => {
+  if (!isRedisConnected) {
+    try {
+      await redisClient.connect();
+      log('Successfully connected to Redis', 'info');
+      isRedisConnected = true;
+    } catch (error) {
+      log('Redis connection failed: ' + error.message, 'error');
+      throw error;
+    }
+  }
+};
+
+/**
+ * @typedef {Object} NewsVerificationResult
+ * @property {string} title - Article title (if available)
+ * @property {string} content - Extracted article content
+ * @property {"real"|"fake"} veracity - Classification result
+ * @property {number} confidence - Model's confidence score (0-1)
+ * @property {number} threshold - Threshold used for classification
+ * @property {string} extracted_at - ISO timestamp of analysis
+ */
+
+/**
+ * News verification service that checks article authenticity using ML
+ * @module services/checkService
+ * @async
  * 
- * @param {string} url - The URL of the news article to verify. Must be a valid HTTP/HTTPS URL.
- * @param {Object} [options] - Optional configuration for customization or testing.
- * @param {NewFetcher} [options.fetchNews=new NewFetcher()] - Custom news fetcher instance. Default uses NewFetcher.
- * @param {TextExtractor} [options.extractor=new TextExtractor()] - Custom text extractor instance. Default uses TextExtractor.
- * @param {PredictionRequester} [options.predictor=new PredictionRequester()] - Custom ML predictor instance. Default uses PredictionRequester.
- * @param {Date} [options.now=new Date()] - Custom timestamp for the extraction. Defaults to current datetime.
+ * @description
+ * This service performs end-to-end news verification by:
+ * 1. Fetching article content from URL
+ * 2. Extracting main text content
+ * 3. Processing through ML model
+ * 4. Caching results in Redis (1 hour TTL)
  * 
- * @returns {Promise<Object>} Result object containing:
- * @returns {string} .title - Article title (if available)
- * @returns {string} .content - Extracted article content
- * @returns {"real"|"fake"} .veracity - Classification result
- * @returns {number} .confidence - Model's confidence score (0-1)
- * @returns {number} .threshold - Threshold used for classification
- * @returns {string} .extracted_at - ISO timestamp of when analysis was performed
+ * Results are cached to prevent reprocessing identical requests.
  * 
- * @throws {Error} If any of these occur:
- * - Invalid URL or failed fetch
- * - Unable to extract article content
- * - Prediction service failure
- * - Redis cache operation failure
+ * @param {string} url - The URL of the news article to verify
+ * @param {Object} [options] - Configuration options
+ * @param {NewFetcher} [options.fetchNews=new NewFetcher()] - Custom fetcher instance
+ * @param {TextExtractor} [options.extractor=new TextExtractor()] - Custom text extractor
+ * @param {PredictionRequester} [options.predictor=new PredictionRequester()] - Custom ML predictor
+ * @param {Date} [options.now=new Date()] - Custom timestamp for the analysis
+ * 
+ * @returns {Promise<NewsVerificationResult>} Verification results
+ * 
+ * @throws {TypeError} If URL is invalid
+ * @throws {Error} If content extraction fails (code: EXTRACTION_FAILED)
+ * @throws {Error} If prediction service fails (code: PREDICTION_FAILED)
+ * @throws {Error} If cache operation fails (code: CACHE_ERROR)
  * 
  * @example
  * // Basic usage
- * const result = await checkService('https://example.com/news-article');
+ * const result = await checkService('https://example.com/news');
  * 
+ * @example
+ * // With custom options
+ * const result = await checkService('https://example.com/news', {
+ *   fetchNews: customFetcher,
+ *   now: new Date('2023-01-01')
+ * });
  */
 const checkService = async (
   url,
@@ -50,6 +101,8 @@ const checkService = async (
     now = new Date()
   } = {}
 ) => {
+  await ensureRedisConnected();
+
   const cachedResult = await redisClient.get(url);
   if (cachedResult) {
     log(`Cache hit para o URL: ${url}`, 'info');
@@ -95,4 +148,4 @@ const checkService = async (
   }
 };
 
-export default checkService;
+module.exports = checkService;

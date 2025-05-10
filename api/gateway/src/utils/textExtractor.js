@@ -1,10 +1,10 @@
-import * as cheerio from "cheerio";
-import { log } from "./logger.js";
+const { log } = require("./logger");
+const cheerio = require("cheerio");
 
 /**
  * Extracts structured content from raw HTML using Cheerio.
  */
-export default class TextExtractor {
+class TextExtractor {
   /**
    * Extracts the title and main text from HTML content.
    * @param {string} html - The raw HTML content.
@@ -63,3 +63,5 @@ export default class TextExtractor {
     return articleText || "No article text found";
   }
 }
+
+module.exports = { TextExtractor };

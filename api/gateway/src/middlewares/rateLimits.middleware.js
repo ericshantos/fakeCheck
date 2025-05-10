@@ -1,6 +1,6 @@
-import rateLimit from "express-rate-limit";
-import { RATE_LIMITS } from "../config/rateLimits.config.js";
-import { log } from "../utils/logger.js";
+const rateLimit = require("express-rate-limit");
+const { RATE_LIMITS } = require("@config");
+const { log } = require("@utils");
 
 /**
  * Creates a rate limiting middleware based on the provided options.
@@ -12,7 +12,7 @@ import { log } from "../utils/logger.js";
  * @param {import("express-rate-limit").Options} options - Custom rate limit options to override defaults.
  * @returns {import("express").RequestHandler} The configured rate limiting middleware.
  */
-export const createLimiter = (options) => {
+const createLimiter = (options) => {
     return rateLimit({
         ...RATE_LIMITS.DEFAULT,
         ...options,
@@ -34,7 +34,7 @@ export const createLimiter = (options) => {
  * @type {import("express").RequestHandler}
  * @memberof module:middlewares/rateLimits
  */
-export const checkLimiter = createLimiter(RATE_LIMITS.CHECK_ENDPOINT);
+const checkLimiter = createLimiter(RATE_LIMITS.CHECK_ENDPOINT);
 
 /**
  * Rate limiter for the /health endpoint.
@@ -45,4 +45,10 @@ export const checkLimiter = createLimiter(RATE_LIMITS.CHECK_ENDPOINT);
  * @type {import("express").RequestHandler}
  * @memberof module:middlewares/rateLimits
  */
-export const healthLimiter = createLimiter(RATE_LIMITS.HEALTH_ENDPOINT);
+const healthLimiter = createLimiter(RATE_LIMITS.HEALTH_ENDPOINT);
+
+module.exports = {
+    createLimiter,
+    checkLimiter,
+    healthLimiter
+}

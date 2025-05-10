@@ -1,5 +1,5 @@
-import checkService from "../services/check.service.js";
-import { log } from "../utils/logger.js";
+const checkService = require("@services/check.service");
+const { log } = require("@utils");
 
 /**
  * Controller to handle news verification requests via GET.
@@ -28,4 +28,4 @@ const checkNewsController = async (req, res) => {
     }
 };
 
-export default checkNewsController;
+module.exports = checkNewsController;

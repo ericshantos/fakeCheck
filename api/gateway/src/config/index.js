@@ -5,13 +5,12 @@
  * based on the current NODE_ENV environment variable. It supports both
  * development and production environments.
  *
- * @module config/app
+ * @module config
  */
-import dotenv from 'dotenv';
+const { RATE_LIMITS } = require("./rateLimits.config");
+const swaggerConfig = require("./swagger.config");
+const dotenv = require("dotenv");
 dotenv.config();
-
-import { devConfig } from "./app.dev.js";
-import { prodConfig } from "./app.prod.js";
 
 /**
  * The current environment of the application.
@@ -21,17 +20,7 @@ import { prodConfig } from "./app.prod.js";
  */
 const env = process.env.NODE_ENV || 'development';
 
-/**
- * Available environment-specific configurations.
- *
- * @constant {Object}
- * @property {Object} development - Configuration for development environment.
- * @property {Object} production - Configuration for production environment.
- */
-const config = {
-  development: devConfig,
-  production: prodConfig
-};
+const app = require(`./environment/${env}`)
 
 /**
  * Exports the configuration based on the current environment.
@@ -39,4 +28,8 @@ const config = {
  * @exports
  * @type {Object}
  */
-export default config[env];
+module.exports = {
+    ...app,
+    RATE_LIMITS,
+    swaggerConfig
+};

@@ -4,7 +4,7 @@
  * This module defines the configuration settings used when the application 
  * is running in production mode.
  *
- * @module config/app.prod
+ * @module environment/production
  */
 
 /**
@@ -18,10 +18,11 @@
  * @property {boolean} debug - Disables debug mode in production.
  * @property {string} logging - Logging level (typically set to "error" to reduce log noise).
  */
-export const prodConfig = {
+
+module.exports = {
     appName: "FakeCheck API",
-    env: 'production',
+    env: "production",
     port: process.env.PORT || 3000,
     debug: false,
-    logging: 'error'
+    logging: "error"
 };

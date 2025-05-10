@@ -1,63 +1,76 @@
-import express from "express";
-import router from "./routes/index.js";
-import swaggerConfig from "./config/swagger.config.js";
-import { createLimiter } from "./middlewares/rateLimits.middleware.js";
-import { debugLogger } from "./middlewares/debugLogger.middleware.js";
+const express = require("express");
+const { swaggerConfig } = require("@config");
+const { loadMiddlewares } = require("@middlewares");
+const { loadRoutes } = require("@routes");
 
+/**
+ * @fileoverview Main application configuration for FakeCheck API
+ * @module app
+ * @requires express
+ * @requires @config/swaggerConfig
+ * @requires @middleware
+ * @requires @routes
+ */
+
+/**
+ * Express application instance
+ * @type {express.Application}
+ */
 const app = express();
 
 /**
- * @fileoverview Initializes the FakeCheck API application.
- *
- * This module configures and exports the main Express application instance,
- * applying essential middleware such as request parsing, logging, rate limiting,
- * and Swagger documentation. It also mounts the primary API router.
- *
- * @module app
- */
-
-/**
- * @description Initializes Swagger API documentation.
+ * Configures and initializes the FakeCheck API application
  * 
- * Applies Swagger UI to the `/docs` endpoint, enabling interactive documentation
- * for developers and users to explore the API.
- */
-swaggerConfig(app);
-
-/**
- * @description Registers the debug logger middleware.
+ * @function initializeApplication
+ * @description Sets up the complete application with:
+ * - Swagger API documentation
+ * - Essential middleware stack
+ * - Route handlers
  * 
- * If `config.debug` is enabled, this middleware logs details of incoming requests,
- * including method, path, headers, and payload, depending on the configured verbosity.
- */
-app.use(debugLogger);
-
-/**
- * @description Parses incoming JSON request bodies.
+ * @param {express.Application} app - The Express application instance
+ * @returns {express.Application} Fully configured Express application
  * 
- * Express middleware that populates `req.body` with parsed JSON content.
- */
-app.use(express.json());
-
-/**
- * @description Applies global rate limiter.
+ * @example
+ * // Typical usage pattern:
+ * const app = require('@src/app');
+ * const PORT = process.env.PORT || 3000;
  * 
- * Middleware for generic rate limiting. This applies basic request throttling to all endpoints,
- * and is usually overridden or complemented by endpoint-specific rate limiters.
+ * app.listen(PORT, () => {
+ *   console.log(`FakeCheck API running on port ${PORT}`);
+ * });
  */
-app.use(createLimiter());
+const initializeApplication = (app) => {
+    /**
+     * @description Swagger API Documentation Configuration
+     * @see {@link @config/swaggerConfig}
+     * 
+     * Sets up interactive API documentation available at:
+     * - `/docs` - Swagger UI interface
+     */
+    swaggerConfig(app);
 
-/**
- * @description Mounts the main application router.
- * 
- * All routes defined in `routes/index.js` are attached to the root path ("/").
- */
-app.use("/", router);
+    /**
+     * @description Loads essential middleware stack including:
+     * - JSON request body parsing
+     * - Debug logging
+     * - Rate limiting
+     * - Security headers
+     * @see {@link @middleware}
+     */
+    loadMiddlewares(app);
 
-/**
- * @exports
- * @type {express.Application}
- * 
- * The configured Express application instance, ready to be started by the server.
- */
-export default app;
+    /**
+     * @description Mounts all API route handlers including:
+     * - `/check` - News verification endpoint
+     * - `/credits` - User credit management
+     * - `/health` - System health monitoring
+     * - `/info` - Service metadata
+     * @see {@link @routes}
+     */
+    loadRoutes(app);
+
+    return app;
+};
+
+// Initialize and export the configured application
+module.exports = initializeApplication(app);

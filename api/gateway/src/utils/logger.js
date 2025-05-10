@@ -1,4 +1,4 @@
-import config from './../config/app.config.js';
+const { logging } = require("@config");
 
 /**
  * Logs a message to the console if the message level is >= config.logging.
@@ -6,14 +6,14 @@ import config from './../config/app.config.js';
  * @param {string} message - The message to log.
  * @param {string} level - The severity level ('verbose', 'info', 'warn', 'error').
  */
-export const log = (message, level = 'info') => {
+const log = (message, level = 'info') => {
     const levels = ['verbose', 'info', 'warn', 'error'];
 
-    const currentLevel = levels.indexOf(config.logging);
+    const currentLevel = levels.indexOf(logging);
     const messageLevel = levels.indexOf(level);
 
     if (currentLevel === -1 || messageLevel === -1) {
-        console.warn(`[WARN] Unknown logging level used: ${config.logging} or ${level}`);
+        console.warn(`[WARN] Unknown logging level used: ${logging} or ${level}`);
         return;
     }
 
@@ -21,3 +21,5 @@ export const log = (message, level = 'info') => {
         console.log(`[${level.toUpperCase()}] ${message}`);
     }
 };
+
+module.exports = { log };

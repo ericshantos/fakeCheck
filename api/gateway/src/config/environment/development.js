@@ -4,7 +4,7 @@
  * This module defines the configuration settings used when the application 
  * is running in development mode.
  *
- * @module config/app.dev
+ * @module environment/development
  */
 
 /**
@@ -18,7 +18,7 @@
  * @property {boolean} debug - Enables detailed debug mode.
  * @property {string} logging - Logging level ("verbose", "info", etc.).
  */
-export const devConfig = {
+module.exports = {
     appName: "Fake Check [DEV]",
     env: "development",
     port: 3000,

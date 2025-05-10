@@ -1,5 +1,5 @@
-import readJson from "../utils/jsonReader.js";
-import { log } from "./../utils/logger.js";
+const { readJson, log } = require("@utils");
+const config = require("@config");
 
 /**
  * Retrieves metadata about the project from the local package.json file.
@@ -59,4 +59,4 @@ const creditsService = async () => {
     };
 };
 
-export default creditsService;
+module.exports = creditsService;

@@ -25,7 +25,7 @@
  * @property {number} HEALTH_ENDPOINT.windowMs - Time window in milliseconds (1 minute).
  * @property {number} HEALTH_ENDPOINT.max - Max number of requests per IP.
  */
-export const RATE_LIMITS = {
+const RATE_LIMITS = {
     DEFAULT: {
       windowMs: 15 * 60 * 1000,
       max: 100,
@@ -41,4 +41,5 @@ export const RATE_LIMITS = {
       max: 10
     }
   };
-  
+
+module.exports = { RATE_LIMITS };

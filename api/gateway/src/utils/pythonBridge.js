@@ -1,5 +1,5 @@
-import { log } from "./logger.js";
-import net from "net";
+const { log } = require("./logger.js");
+const net = require("net");
 
 /**
  * Class to interact with a remote prediction service over a TCP connection.
@@ -7,7 +7,7 @@ import net from "net";
  * 
  * @class PredictionRequester
  */
-export default class PredictionRequester {
+class PredictionRequester {
     constructor () {
         // Creates a new TCP client socket for communication with the remote service
         this.client = new net.Socket();
@@ -79,3 +79,5 @@ export default class PredictionRequester {
         }
     }
 };
+
+module.exports = { PredictionRequester }

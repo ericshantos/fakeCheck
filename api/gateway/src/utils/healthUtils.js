@@ -1,7 +1,7 @@
-import PredictionRequester from "./pythonBridge.js";
-import axios from "axios";
-import os from "os";
-import { log } from "./logger.js";
+const { PredictionRequester } = require("./pythonBridge.js");
+const { log } = require("./logger.js");
+const axios = require("axios");
+const os = require("os");
 
 /**
  * Checks if the application has internet access by attempting to reach Google.
@@ -11,7 +11,7 @@ import { log } from "./logger.js";
  * @returns {Promise<{ status: 'success' | 'error', message: string }>}
  * Returns the result of the internet connectivity check.
  */
-export const checkInternetConnection = async () => {
+const checkInternetConnection = async () => {
     try {
         await axios.get('https://www.google.com', { timeout: 2000 });
         return { status: 'success', message: 'Internet connection established' };
@@ -29,7 +29,7 @@ export const checkInternetConnection = async () => {
  * @returns {Promise<{ status: 'success' | 'error', message: string }>}
  * Returns the result of the scraper functionality check.
  */
-export const checkScraper = async () => {
+const checkScraper = async () => {
     try {
         const html = '<html><body><p>Test news</p></body></html>';
         const match = html.match(/<p>(.*?)<\/p>/)?.[1];
@@ -59,7 +59,7 @@ export const checkScraper = async () => {
  * - message: A descriptive message about the resource status.
  * - metrics: An object containing the system's free memory (in MB) and load average.
  */
-export const checkSystemResources = () => {
+const checkSystemResources = () => {
     const freeMemory = os.freemem() / 1024 / 1024; // In MB
     const loadAvg = os.loadavg()[0];
   
@@ -89,7 +89,7 @@ export const checkSystemResources = () => {
  * @returns {Promise<{ status: 'success' | 'error', message: string, data?: any }>}
  * Returns the result of the model functionality check, including prediction output if successful.
  */
-export const checkModel = async ({
+const checkModel = async ({
     predictor = new PredictionRequester(),
     text = "noticia falso espalhar rapidamente rede social poder causar desinformacao larga escala"
 } = {}) => {
@@ -115,4 +115,11 @@ export const checkModel = async ({
             message: `Error checking model: ${error.message}`
         };
     }
+};
+
+module.exports = {
+    checkInternetConnection,
+    checkScraper,
+    checkSystemResources,
+    checkModel
 };

@@ -1,5 +1,5 @@
-import creditsService from "../services/credits.service.js";
-import { log } from "../utils/logger.js";
+const creditsService = require("@services/credits.service");
+const { log } = require("@utils");
 
 /**
  * Controller to handle requests for project credits metadata.
@@ -21,4 +21,4 @@ const creditsController = async (req, res) => {
     }
 };
 
-export default creditsController;
+module.exports = creditsController;

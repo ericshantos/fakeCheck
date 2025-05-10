@@ -1,10 +1,10 @@
-import {
+const {    
     checkInternetConnection,
     checkScraper,
     checkSystemResources,
-    checkModel
-} from "../utils/healthUtils.js";
-import { log } from "./../utils/logger.js";
+    checkModel,
+    log
+} = require("@utils");
 
 /**
  * Performs a full health check of the application by running individual diagnostics:
@@ -28,7 +28,7 @@ import { log } from "./../utils/logger.js";
 const healthService = async () => {
     log("Starting system health check...", "info");
 
-    const [internet, scraper, model, systemResources] = await Promise.all([
+    const [internet, scraper, systemResources, model] = await Promise.all([
         checkInternetConnection(),
         checkScraper(),
         checkSystemResources(),
@@ -59,4 +59,4 @@ const healthService = async () => {
     };
 };
 
-export default healthService;
+module.exports = healthService;

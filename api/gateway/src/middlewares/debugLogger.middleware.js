@@ -1,5 +1,5 @@
-import config from '../config/app.config.js';
-import { log } from '../utils/logger.js';
+const config = require("@config");
+const { log } = require("@utils");
 
 /**
  * @fileoverview Express middleware for logging HTTP requests in debug mode.
@@ -21,7 +21,7 @@ import { log } from '../utils/logger.js';
  * @param {import('express').Response} res - The HTTP response object.
  * @param {import('express').NextFunction} next - The next middleware function in the stack.
  */
-export const debugLogger = (req, res, next) => {
+const debugLogger = (req, res, next) => {
     try {
         if (config.debug) {
             const timestamp = new Date().toISOString();
@@ -42,3 +42,5 @@ export const debugLogger = (req, res, next) => {
         next();
     }
 };
+
+module.exports = debugLogger;
