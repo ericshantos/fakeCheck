@@ -1,29 +1,23 @@
-const healthService = require("@services/health.service");
-const { log } = require("@utils");
+const { Logger } = require("@utils");
+const { health } = require("@services");
 
-/**
- * Controller responsible for handling the /health route.
- * It gathers health check information and sends the appropriate response.
- *
- * @async
- * @function
- * @param {import("express").Request} req - Express request object.
- * @param {import("express").Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response containing health check status and details.
- */
+const logger = new Logger();
+
 const healthController = async (req, res) => {
     try {
-        const report = await healthService();
+        const report = await health.run();
 
         const httpStatus = report.status === 'healthy' ? 200 : 503;
 
-        log(`[RESULT] /health - Status: ${report.status}`, report.status === 'healthy' ? "info" : "warn");
+        logger[report.status === "healthy" ? "info" : "warn"](
+            `[RESULT] /health - Status: ${report.status}`
+        );
 
-        res.status(httpStatus).json(report);
+        return res.status(httpStatus).json(report);
     } catch (error) {
-        log(`/health - Failed to execute check: ${error.message}`, "error");
+        logger.error(`/health - Failed to execute check: ${error.message}`);
 
-        res.status(500).json({
+        return res.status(500).json({
             status: 'error',
             message: 'An unexpected error occurred in healthController.',
             details: error.message
@@ -31,4 +25,4 @@ const healthController = async (req, res) => {
     }
 };
 
-module.exports = healthController;
+module.exports = { healthController };

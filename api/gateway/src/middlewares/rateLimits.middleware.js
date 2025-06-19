@@ -1,6 +1,8 @@
 const rateLimit = require("express-rate-limit");
 const { RATE_LIMITS } = require("@config");
-const { log } = require("@utils");
+const { Logger } = require("@utils");
+
+const logger = new Logger();
 
 /**
  * Creates a rate limiting middleware based on the provided options.
@@ -17,7 +19,7 @@ const createLimiter = (options) => {
         ...RATE_LIMITS.DEFAULT,
         ...options,
         handler: (req, res) => {
-            log(`[RATE LIMIT] Request blocked: IP ${req.ip} on route ${req.originalUrl}`, "warn");
+            logger.warn(`[RATE LIMIT] Request blocked: IP ${req.ip} on route ${req.originalUrl}`);
             res.status(429).json({
                 error: "Too many requests, please try again later."
             });

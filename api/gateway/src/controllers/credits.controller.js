@@ -1,24 +1,19 @@
-const creditsService = require("@services/credits.service");
-const { log } = require("@utils");
+const { credits } = require("@services");
+const { Logger } = require("@utils");
 
-/**
- * Controller to handle requests for project credits metadata.
- *
- * @param {import('express').Request} req - The HTTP request object.
- * @param {import('express').Response} res - The HTTP response object.
- * @returns {Promise<void>}
- */
+const logger = new Logger();
+
 const creditsController = async (req, res) => {
     try {
-        const credits = await creditsService();
+        const report = await credits.run('package.json');
 
-        log("[SUCCESS] /credits - Metadata returned successfully", "info");
+        logger.info("[SUCCESS] /credits - Metadata returned successfully");
 
-        res.status(200).json(credits);
+        return res.status(200).json(report);
     } catch (error) {
-        log(`/credits - Failed to retrieve credits: ${error.message}`, "error");
-        res.status(500).json({ error: "Failed to retrieve project credits." });
+        logger.error(`/credits - Failed to retrieve credits: ${error.message}`);
+        return res.status(500).json({ error: "Failed to retrieve project credits." });
     }
 };
 
-module.exports = creditsController;
+module.exports = { creditsController };

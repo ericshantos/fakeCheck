@@ -1,5 +1,7 @@
-const config = require("@config");
-const { log } = require("@utils");
+const { debug, logging } = require("@config");
+const { Logger } = require("@utils");
+
+const logger = new Logger();
 
 /**
  * @fileoverview Express middleware for logging HTTP requests in debug mode.
@@ -23,21 +25,21 @@ const { log } = require("@utils");
  */
 const debugLogger = (req, res, next) => {
     try {
-        if (config.debug) {
+        if (debug) {
             const timestamp = new Date().toISOString();
             const { method, originalUrl, headers, body } = req;
 
             const logMessage = `[DEBUG] [${timestamp}] ${method} ${originalUrl}`;
-            log(logMessage, config.logging);
+            logger[logging](logMessage);
 
-            if (config.logging === 'verbose') {
-                log(`[DEBUG] Headers: ${JSON.stringify(headers)}`, config.logging);
-                log(`[DEBUG] Body: ${JSON.stringify(body)}`, config.logging);
+            if (logging === 'verbose') {
+                logger[logging](`[DEBUG] Headers: ${JSON.stringify(headers)}`);
+                logger[logging](`[DEBUG] Body: ${JSON.stringify(body)}`);
             }
         }
     } catch (err) {
         // Prevents logging failures from crashing the app
-        console.error('[Logger Error]', err);
+        logger.error('[Logger Error]' + err);
     } finally {
         next();
     }

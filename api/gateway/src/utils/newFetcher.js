@@ -1,17 +1,14 @@
-const { log } = require("./logger");
 const axios = require("axios");
 
-/**
- * NewsFetcher encapsulates the HTTP client and the logic to fetch news articles.
- */
 class NewsFetcher {
-  constructor() {
-    this.httpClient = axios.create({
+  constructor({ httpClient = axios.create, logger = console } = {}) {
+    this.httpClient = httpClient({
       timeout: 10000,
       headers: {
         "User-Agent": "FakeCheck/1.0 (+https://github.com/ericshantos/fakeCheck)"
       }
     });
+    this.logger = logger;
   }
 
   /**
@@ -22,21 +19,21 @@ class NewsFetcher {
    */
   async fetch(url) {
     try {
-      log(`Attempting to fetch news from URL: ${url}`, "info");
+      this.logger.info(`Attempting to fetch news from URL: ${url}`);
 
       new URL(url);
 
       const response = await this.httpClient.get(url);
 
-      log(`Successfully fetched news from URL: ${url}`, "info");
+      this.logger.info(`Successfully fetched news from URL: ${url}`);
 
       return response.data;
     } catch (error) {
-      log(`Error fetching news from URL: ${url}`, "error");
-      log(`Error details: ${error.message}`, "error");
+      this.logger.error(`Error fetching news from URL: ${url}`);
+      this.logger.error(`Error details: ${error.message}`);
 
       if (error.response) {
-        log(`Error status: ${error.response.status}`, "error");
+        this.logger.error(`Error status: ${error.response.status}`);
       }
 
       throw new Error("Unable to fetch the news content.");

@@ -1,5 +1,5 @@
 const express = require("express");
-const checkController = require("@controllers/check.controller");
+const { checkNewsController } = require("@controllers");
 const { checkLimiter } = require("@middlewares");
 
 // Create an Express router instance.
@@ -17,6 +17,6 @@ const router = express.Router();
  * @param {express.Request} req - The request object containing the news URL.
  * @param {express.Response} res - The response object returning the model's prediction.
  */
-router.post("/", checkLimiter, checkController);
+router.post("/", checkLimiter, checkNewsController);
 
 module.exports = router;

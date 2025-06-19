@@ -1,5 +1,5 @@
 const path = require("path");
-const { log } = require("./logger");
+const { Logger } = require("./logger");
 
 /**
  * Utility class for resolving absolute paths based on the root of the project.
@@ -9,6 +9,7 @@ class PathHelper {
    * The absolute path to the root directory of the project.
    */
   static ROOT_DIR = path.resolve(__dirname, '..', '..');
+  static logger = new Logger();
 
   /**
    * Resolves an absolute path from a path relative to the project root.
@@ -20,10 +21,10 @@ class PathHelper {
       }
 
       const fullPath = path.resolve(PathHelper.ROOT_DIR, relativePath);
-      log(`Resolved absolute path: ${fullPath}`, "info");
+      PathHelper.logger.info(`Resolved absolute path: ${fullPath}`);
       return fullPath;
     } catch (error) {
-      log(`Error resolving path: ${error.message}`, "error");
+      PathHelper.logger.error(`Error resolving path: ${error.message}`);
       throw error;
     }
   }

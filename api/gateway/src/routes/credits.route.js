@@ -1,4 +1,4 @@
-const creditsController = require("@controllers/credits.controller");
+const { creditsController } = require("@controllers");
 const express = require("express");
 
 // Create an Express router instance.

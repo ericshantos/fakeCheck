@@ -1,4 +1,4 @@
-const healthController = require("@controllers/health.controller");
+const { healthController } = require("@controllers");
 const { healthLimiter } = require("@middlewares");
 const express = require("express");
 

@@ -1,31 +1,23 @@
-const infoService = require("@services/info.service");
-const { log } = require("@utils"); 
+const { info } = require("@services");
+const { Logger } = require("@utils");
 
-/**
- * Controller to handle requests for version and model information.
- * This function responds with detailed version, update, and model information.
- * 
- * @async
- * @function
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @returns {Promise<void>} Sends a JSON response with version and model details, or an error.
- */
+const logger = new Logger();
+
 const infoController = async (req, res) => {
   try {
-    const info = await infoService();
+    const report = await info.run("package.json");
 
-    log("[SUCCESS] /info - Information returned successfully", "info");
+    logger.info("[SUCCESS] /info - Information returned successfully!");
 
-    return res.status(200).json(info);
-  } catch (error) {
-    log(`/info - Error fetching information: ${error.message}`, "error");
+    return res.status(200).json(report);
+  } catch(error) {
+    logger.error(`/info - Error fetching information: ${error.message}`);
 
     return res.status(500).json({
-      error: 'Internal server error',
+      error: "Internet server error",
       message: error.message
     });
   }
 };
 
-module.exports = infoController;
+module.exports = { infoController };

@@ -1,31 +1,25 @@
-const checkService = require("@services/check.service");
-const { log } = require("@utils");
+const { check } = require("@services");
+const { Logger } = require("@utils");
 
-/**
- * Controller to handle news verification requests via GET.
- *
- * @param {import('express').Request} req - Express request object
- * @param {import('express').Response} res - Express response object
- * @returns {Promise<void>}
- */
+const logger = new Logger();
+
 const checkNewsController = async (req, res) => {
     try {
         const { url } = req.body;
 
         if (typeof url !== "string" || !url.startsWith("http")) {
-            log(`[BAD REQUEST] Invalid URL received: ${url}`, "warn");
+            logger.warn(`[BAD REQUEST] Invalid URL received: ${url}`);
             return res.status(400).json({ error: "The provided URL is invalid or missing." });
-          }
+        }
 
-        const features = await checkService(url);
+        const report = await check.run(url);
 
-        log(`[SUCCESS] Verification completed for URL: ${url} | Veracity: ${features.veracity} | Confidence: ${features.confidence}`, "info");
-
-        return res.status(200).json(features);
+        logger.info(`[SUCCESS] Verification completed for URL: ${url} | Veracity: ${report.veracity} | Confidence: ${report.confidence}`);
+        return res.status(200).json(report);
     } catch (error) {
-        log(`Error checking URL: ${req.body.url} | Message: ${error.message}`, "error");
+        logger.error(`Error checking URL: ${req.body.url} | Message: ${error.message}`);
         return res.status(500).json({ error: "Internal server error." });
     }
 };
 
-module.exports = checkNewsController;
+module.exports = { checkNewsController };

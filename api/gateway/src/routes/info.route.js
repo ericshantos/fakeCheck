@@ -1,5 +1,5 @@
 const express = require("express");
-const infoController = require("@controllers/info.controller");
+const { infoController } = require("@controllers");
 
 // Create an Express router instance.
 const router = express.Router();
