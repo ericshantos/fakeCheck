@@ -1,0 +1,167 @@
+{
+  "name": "fake-check",
+  "version": "3.0.0",
+  "description": "API that analyzes news content and verifies its veracity using AI.",
+  "contact": "ericshantos13@gmail.com",
+  "code_repository": "https://github.com/CheckFake/fakeCheck_API",
+  "technologies": [
+    "Node.js",
+    "Express",
+    "TensorFlow",
+    "Keras",
+    "Pickle",
+    "Spacy",
+    "Sklearn",
+    "Cheerio",
+    "Axios",
+    "Redis"
+  ],
+  "private": "false",
+  "license": "MIT",
+    "keywords": [
+    "fake news",
+    "deep learning"
+  ],
+  "author": "Eric Santos",
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "generate:barrels": "barrelsby"
+  },
+  "dependencies": {
+    "@ericshantos/logger": "^1.0.2",
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.2.0",
+    "@nestjs/throttler": "^6.4.0",
+    "axios": "^1.10.0",
+    "cheerio": "^1.1.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "express-rate-limit": "^8.0.1",
+    "generic-pool": "^3.9.0",
+    "net": "^1.0.2",
+    "open": "^10.1.2",
+    "redis": "^5.6.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
+    "@eslint/js": "^9.18.0",
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.1",
+    "@swc/cli": "^0.6.0",
+    "@swc/core": "^1.10.7",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.10.7",
+    "@types/supertest": "^6.0.2",
+    "barrelsby": "^2.8.1",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^16.0.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.4.2",
+    "source-map-support": "^0.5.21",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  },
+    "model_metadata": {
+    "model_name": "checkfake-lstm-v1.1",
+    "description": "LSTM model trained for fake news detection in Portuguese.",
+    "version": "v1.1",
+    "language": "pt-BR",
+    "author": "Eric Santos",
+    "framework": {
+      "name": "TensorFlow",
+      "version": "2.19.0"
+    },
+    "model_architecture": "Bi-LSTM with pre-trained embeddings",
+    "input_format": {
+      "type": "sequences of text",
+      "tokenizer": "Tokenizer of Keras",
+      "max_sequences_length": 200
+    },
+    "vocabulary_size": 20000,
+    "threshold": 0.7,
+    "preprocessing": {
+      "module": "nlp_predictor v1.0",
+      "steps": [
+        "Punctuation Removal",
+        "Tokenization",
+        "Lowercasing",
+        "Stopword removal",
+        "Padding"
+      ],
+      "language": "pt"
+    },
+    "labels": {
+      "0": "fake news",
+      "1": "real news"
+    },
+    "metrics": {
+      "accuracy": "0.95",
+      "recall": "0.94",
+      "f1": "0.95",
+      "precision": "0.96",
+      "ROC AUC": "0.96"
+    },
+    "training_data": {
+      "dataset_name": "Fake.Br Corpus",
+      "train_test_split": "80/20",
+      "last_update": "2025-04-12",
+      "source": "https://github.com/roneysco/Fake.br-Corpus"
+    },
+    "environment": {
+      "runtime": "Python 3.10.6",
+      "platform": "Ubuntu 22.04",
+      "containerized": true,
+      "environment_type": "production"
+    },
+    "license": "MIT",
+    "limitations": "This model was trained exclusively on Portuguese-language journalistic data from Brazil. It is not suitable for detecting irony, satire, or multimodal content (such as memes, images, or videos). It may exhibit bias towards topics and sources that are overrepresented in the training data. The model does not generalize well to informal language, social media slang, or regional dialects. It should not be used for legal, judicial, or high-stakes decision-making contexts.",
+    "notes": "Experimental model — do not use for legal or judicial decisions.",
+    "file": {
+      "path": "./checkfake-lstm-v1.1-ptbr.h5",
+      "size_MB": "16.9"
+    }
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  }
+}
