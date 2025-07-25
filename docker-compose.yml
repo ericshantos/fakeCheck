@@ -21,14 +21,12 @@ services:
       timeout: 10s
       retries: 3
     build:
-      context: ./api/gateway/
+      context: ./gateway/
     container_name: fakecheck_gateway
     ports:
       - "3000:3000"
     expose:
       - "3000"
-    volumes:
-      - ./api/nlp_predictor/model/model_metadata.json:/app/metadatas/model_metadata.json
     depends_on:
       redis: 
         condition: service_healthy
@@ -44,8 +42,8 @@ services:
       timeout: 10s
       retries: 3
     build:
-      context: ./api/nlp_predictor
-    container_name: fakecheck_nlp_predictor
+      context: ./predictor
+    container_name: fakecheck_predictor
     ports:
       - "9000:9000"
     expose:
