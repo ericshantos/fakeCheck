@@ -1,6 +1,6 @@
 [🇬🇧] [Read in English](README.md)
 
-# FakeCheck API
+# FakeCheck API v3.0
 
 ![Licença](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node.js](https://img.shields.io/badge/Node.js-20-green.svg)
@@ -8,21 +8,24 @@
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.19-orange.svg)
 ![Docker & Docker Compose](https://img.shields.io/badge/Docker_&_Compose-enabled-2496ED?logo=docker&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-Cached-red.svg)
+![NestJS](https://img.shields.io/badge/NestJS-11.0-purple.svg)
 
-Uma API RESTful para detecção de fake news em português utilizando deep learning, construída com Express.js e Python.
+API de alta performance para detecção de fake news em português usando deep learning, construída com microserviços NestJS e Python.
 
 ## Índice
-- [FakeCheck API](#fakecheck-api)
+- [FakeCheck API v3.0](#fakecheck-api-v30)
   - [Índice](#índice)
+  - [Principais Melhorias (v3.0)](#principais-melhorias-v30)
   - [Problema](#problema)
   - [Solução](#solução)
   - [Funcionalidades](#funcionalidades)
+    - [Funcionalidades Principais](#funcionalidades-principais)
+    - [Recursos Técnicos](#recursos-técnicos)
   - [Arquitetura Técnica](#arquitetura-técnica)
   - [Detalhes do Modelo](#detalhes-do-modelo)
     - [Arquitetura](#arquitetura)
-    - [Dados de Treinamento](#dados-de-treinamento)
-    - [Métricas de Desempenho](#métricas-de-desempenho)
-    - [Recursos Chave](#recursos-chave)
+    - [Desempenho](#desempenho)
+    - [Características](#características)
   - [Documentação da API](#documentação-da-api)
     - [Endpoints](#endpoints)
   - [Instalação](#instalação)
@@ -32,114 +35,115 @@ Uma API RESTful para detecção de fake news em português utilizando deep learn
   - [Licença](#licença)
   - [Agradecimentos](#agradecimentos)
 
+## Principais Melhorias (v3.0)
+- **Migração para NestJS**: Reescrita completa de Express para NestJS
+- **Tipagem Avançada**: Tipos TypeScript em toda a aplicação
+- **Design Modular**: Organização por módulos funcionais
+- **Tratamento de Erros**: Respostas de erro padronizadas
+- **Verificação de Saúde**: Monitoramento completo do sistema
+- **Serviço de Predição Otimizado**: Processamento mais rápido
+- **Documentação Aprimorada**: Integração com Swagger
+
 ## Problema
 
-Fake news se tornaram um problema social significativo, espalhando desinformação rapidamente por canais digitais. A falta de ferramentas confiáveis para verificar automaticamente a autenticidade de notícias em português agrava esse problema, especialmente no ecossistema midiático brasileiro.
+As fake news tornaram-se um problema social significativo, espalhando desinformação rapidamente através de canais digitais. A falta de ferramentas confiáveis para verificar automaticamente a autenticidade de notícias em português agrava esse problema, especialmente no ecossistema midiático brasileiro.
 
 ## Solução
 
-O FakeCheck oferece uma API que:
-1. Extrai texto de artigos de notícias via URL  
-2. Processa o conteúdo usando técnicas de PLN (Processamento de Linguagem Natural)  
-3. Classifica o artigo como “real” ou “falso” usando um modelo LSTM personalizado  
-4. Retorna uma pontuação de confiança junto com a previsão  
-5. Implementa cache com Redis para melhor desempenho  
-6. Fornece monitoramento abrangente da saúde do sistema  
-
-O modelo atinge 95% de acurácia em conjuntos de dados de notícias em português.
+O FakeCheck fornece uma API que:
+1. Extrai texto de artigos de notícias via URL
+2. Processa o conteúdo com pipelines NLP otimizados
+3. Classifica artigos usando nosso modelo LSTM personalizado (95% de acurácia)
+4. Retorna veracidade com score de confiança
+5. Implementa cache Redis com TTL de 1 hora
+6. Oferece monitoramento em tempo real da saúde do sistema
 
 ## Funcionalidades
 
-- **Verificação de Notícias**: Endpoint POST para verificar autenticidade de notícias com cache Redis (TTL de 1 hora)  
-- **Saúde do Sistema**: Endpoint GET para monitoramento de serviço com controle de taxa  
-- **Informações do Modelo**: Endpoint GET com detalhes da versão e arquitetura  
-- **Metadados do Projeto**: Endpoint GET com créditos e tecnologias utilizadas  
-- **Containerizado**: Pronto para implantação com Docker Compose (Node.js, Python, Redis)  
-- **Escalável**: Arquitetura de microsserviços com serviços separados  
-- **Rate Limiting**: Proteção contra abusos com limites configuráveis  
-- **Log Completo**: Registro detalhado de requisições e rastreamento de erros  
-- **Documentação Swagger**: Documentação interativa da API disponível em `/docs`
+### Funcionalidades Principais
+- **Verificação de Notícias**: Endpoint POST com cache Redis
+- **Saúde do Sistema**: Monitoramento abrangente
+- **Metadados do Modelo**: Detalhes da versão e arquitetura
+- **Informações do Projeto**: Stack tecnológica e créditos
+
+### Recursos Técnicos
+- **Arquitetura de Microsserviços**: Node.js + Python
+- **Containerizado**: Pronto para Docker Compose
+- **Limitação de Taxa**: Proteção contra abuso
+- **Logs Detalhados**: Rastreamento de erros
+- **Documentação Swagger**: Interativa
+- **Validação**: Sanitização de inputs
+- **Tipagem Forte**: Interfaces TypeScript
 
 ## Arquitetura Técnica
 
 ```
-├── API Gateway (Node.js/Express)
-│   ├── Rotas
+├── API Gateway (NestJS)
+│   ├── Módulos
+│   │   ├── Check - Verificação de notícias  
+│   │   ├── Health - Monitoramento
+│   │   ├── Info - Metadados
+│   │   └── Shared - Utilitários
 │   ├── Controladores
 │   ├── Serviços
-│   ├── Middlewares (Rate limiting, Logs)
-│   └── Utils (Extração de texto, ponte com Python)
+│   ├── Middlewares
+│   └── Pipes/Interceptores
 │
-├── Previsor NLP (Python)
+├── Serviço de Predição (Python)
 │   ├── Modelo LSTM (TensorFlow/Keras)
-│   ├── Pré-processamento de Texto (spaCy)
-│   └── Servidor via socket
+│   ├── Pré-processamento (spaCy)
+│   └── Servidor Socket (Threaded)
 │
 └── Cache Redis
-    └── Previsões armazenadas (TTL de 1 hora)
+    └── Predições em cache
 ```
 
 ## Detalhes do Modelo
 
-O modelo principal de machine learning que alimenta esta API foi desenvolvido e treinado por mim (Eric Santos) como parte do projeto [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector).
-
 ### Arquitetura
 ```
-Camada de Entrada → Camada de Embedding (300D) → LSTM Bidirecional (128 unidades) → 
-Camada Densa (64 unidades, ReLU) → Camada de Saída (1 unidade, Sigmoid)
+Camada de Entrada → Embedding (300D) → LSTM Bidirecional (128 unidades) → 
+Camada Densa (64 unidades, ReLU) → Saída (1 unidade, Sigmoid)
 ```
 
-### Dados de Treinamento
-- Fonte: [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus)
-- Amostras: 7.200 artigos de notícias (50% reais, 50% falsos)
-- Divisão treino/teste: 80/20
+### Desempenho
+| Métrica      | Valor |
+|--------------|-------|
+| Acurácia     | 95%   |
+| Precisão     | 96%   |
+| Recall       | 94%   |
+| F1-Score     | 95%   |
+| ROC AUC      | 96%   |
 
-### Métricas de Desempenho
-| Métrica     | Valor |
-|-------------|-------|
-| Acurácia    | 95%   |
-| Precisão    | 96%   |
-| Recall      | 94%   |
-| F1-Score    | 95%   |
-| ROC AUC     | 96%   |
-
-### Recursos Chave
-- Tokenizador personalizado otimizado para português brasileiro  
-- Tratamento especial para vocabulário jornalístico  
-- Limiar adaptativo (padrão: 0.7 de confiança)  
-- Cache com Redis para melhorar o desempenho  
-- Verificações de saúde completas
+### Características
+- Otimizado para português brasileiro
+- Vocabulário jornalístico
+- Limiar de confiança (0.7 padrão)
+- Integração com Hugging Face Hub
+- Pré-processamento eficiente
 
 ## Documentação da API
 
-A documentação interativa da API é gerada automaticamente usando Swagger UI e está disponível no endpoint `/docs` quando o serviço está em execução. A documentação inclui:
-
-- Descrição detalhada dos endpoints  
-- Exemplos de requisições e respostas  
-- Especificações de parâmetros  
-- Códigos de erro  
-- Informações sobre limites de requisição  
+Documentação interativa disponível em `/docs` quando executado localmente.
 
 ### Endpoints
+| Método | Endpoint  | Descrição          | Parâmetros            | Limite        |
+|--------|-----------|--------------------|------------------------|---------------|
+| POST   | /check    | Verificar notícia  | `{ "url": "string" }` | 50/15min      |
+| GET    | /info     | Informações        | -                      | 100/15min     |
+| GET    | /health   | Saúde do sistema   | -                      | 10/1min       |
 
-| Método | Endpoint  | Descrição                        | Parâmetros            | Limite         |
-|--------|-----------|----------------------------------|------------------------|----------------|
-| POST   | /check    | Verifica autenticidade da notícia | `{ "url": "string" }` | 50/15min       |
-| GET    | /info     | Metadados do modelo              | -                      | 100/15min      |
-| GET    | /health   | Diagnóstico do sistema           | -                      | 10/1min        |
-| GET    | /credits  | Informações do projeto           | -                      | 100/15min      |
-
-Exemplo de Requisição:
+**Exemplo de Requisição:**
 ```bash
 curl -X POST http://localhost:3000/check \
   -H "Content-Type: application/json" \
-  -d '{"url":"https://example.com/news-article"}'
+  -d '{"url":"https://exemplo.com/noticia"}'
 ```
 
-Exemplo de Resposta:
+**Exemplo de Resposta:**
 ```json
 {
-  "veracidade": "real",
+  "veracidade": "verdadeira",
   "confianca": 0.92,
   "limiar": 0.7,
   "extraido_em": "2025-04-18T12:34:56.789Z"
@@ -153,35 +157,37 @@ Exemplo de Resposta:
 - Docker Compose 2.0+
 
 ### Configuração
-1. Clone o repositório:
 ```bash
 git clone https://github.com/ericshantos/fakeCheck.git
 cd fakeCheck
-```
-
-2. Construa e inicie os serviços:
-```bash
 docker-compose up --build
 ```
-
-A API estará disponível em `http://localhost:3000`
+Acesse a API em `http://localhost:3000`
 
 ## Contribuindo
-
-Contribuições são bem-vindas! Siga os passos abaixo:
-1. Faça um fork do repositório  
-2. Crie um branch de funcionalidade (`git checkout -b feature/sua-funcionalidade`)  
-3. Faça o commit das suas alterações (`git commit -am 'Adicionar nova funcionalidade'`)  
-4. Faça o push para o branch (`git push origin feature/sua-funcionalidade`)  
+1. Faça um fork do repositório
+2. Crie um branch (`git checkout -b feature/sua-feature`)
+3. Faça commit das mudanças (`git commit -am 'Adiciona feature'`)
+4. Faça push do branch (`git push origin feature/sua-feature`)
 5. Abra um Pull Request
 
 ## Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](./LICENSE) para mais detalhes.
 
 ## Agradecimentos
-- [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus) pelos dados de treinamento  
-- [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector) - Modelo LSTM desenvolvido por mim (Eric Santos) especialmente para este projeto  
-- Programadores do Futuro pelo apoio educacional  
-- TensorFlow/Keras pelo framework de deep learning  
-- Redis pela implementação de cache
+- [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus) pelos dados de treinamento
+- Programadores do Futuro pelo apoio
+- Equipe TensorFlow/Keras
+- Redis pelo cache
+- Framework NestJS
+```
+
+Principais adaptações para português:
+1. Tradução de todos os títulos e conteúdo
+2. Adaptação de termos técnicos (ex: "rate limiting" → "limitação de taxa")
+3. Exemplos com URLs em português
+4. Manutenção da estrutura original com seções equivalentes
+5. Conservação dos links e formatos técnicos
+6. Tradução de métricas e conceitos de ML
+7. Ajuste de nomes de endpoints para versão em português
+8. Manutenção das badges de tecnologias (em inglês, como é padrão)

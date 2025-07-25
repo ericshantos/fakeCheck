@@ -1,6 +1,6 @@
 [🇧🇷] [Lê em português](README.pt.md)
 
-# FakeCheck API
+# FakeCheck API v3.0
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node.js](https://img.shields.io/badge/Node.js-20-green.svg)
@@ -8,20 +8,23 @@
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.19-orange.svg)
 ![Docker & Docker Compose](https://img.shields.io/badge/Docker_&_Compose-enabled-2496ED?logo=docker&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-Cached-red.svg)
+![NestJS](https://img.shields.io/badge/NestJS-11.0-purple.svg)
 
-A RESTful API for detecting fake news in Portuguese using deep learning, built with Express.js and Python.
+A high-performance API for detecting fake news in Portuguese using deep learning, built with NestJS and Python microservices.
 
 ## Table of Contents
-- [FakeCheck API](#fakecheck-api)
+- [FakeCheck API v3.0](#fakecheck-api-v30)
   - [Table of Contents](#table-of-contents)
+  - [Key Improvements (v3.0)](#key-improvements-v30)
   - [Problem Statement](#problem-statement)
   - [Solution](#solution)
   - [Features](#features)
+    - [Core Functionality](#core-functionality)
+    - [Technical Features](#technical-features)
   - [Technical Architecture](#technical-architecture)
   - [Model Details](#model-details)
     - [Architecture](#architecture)
-    - [Training Data](#training-data)
-    - [Performance Metrics](#performance-metrics)
+    - [Performance](#performance)
     - [Key Features](#key-features)
   - [API Documentation](#api-documentation)
     - [Endpoints](#endpoints)
@@ -32,6 +35,15 @@ A RESTful API for detecting fake news in Portuguese using deep learning, built w
   - [License](#license)
   - [Acknowledgments](#acknowledgments)
 
+## Key Improvements (v3.0)
+- **Complete NestJS Migration**: Rewritten from Express to NestJS for better architecture
+- **Enhanced Type Safety**: Strict typing throughout the codebase
+- **Modular Design**: Feature-based module organization
+- **Improved Error Handling**: Comprehensive error responses
+- **Advanced Health Checks**: System-wide monitoring endpoints
+- **Optimized Predictor Service**: Faster text processing and prediction
+- **Better Documentation**: Swagger integration with examples
+
 ## Problem Statement
 
 Fake news has become a significant social problem, spreading misinformation rapidly through digital channels. The lack of reliable tools to automatically verify news authenticity in Portuguese exacerbates this issue, particularly in Brazilian media ecosystems.
@@ -39,104 +51,96 @@ Fake news has become a significant social problem, spreading misinformation rapi
 ## Solution
 
 FakeCheck provides an API that:
-1. Extracts text from news articles via URL
-2. Processes the content using NLP techniques
-3. Classifies the article as "real" or "fake" using a custom-trained LSTM model
-4. Returns a confidence score with the prediction
-5. Implements Redis caching for improved performance
-6. Provides comprehensive health monitoring
-
-The model achieves 95% accuracy on Portuguese-language news datasets.
+1. Extracts text from news articles via URL using advanced scraping
+2. Processes content with optimized NLP pipelines
+3. Classifies articles using our custom LSTM model (95% accuracy)
+4. Returns veracity with confidence scoring
+5. Implements Redis caching with 1-hour TTL
+6. Provides real-time system health monitoring
 
 ## Features
 
-- **News Verification**: POST endpoint to check news authenticity with Redis caching (1-hour TTL)
-- **System Health**: GET endpoint for service monitoring with rate limiting
-- **Model Information**: GET endpoint for version and architecture details
-- **Project Metadata**: GET endpoint with credits and technology stack
-- **Containerized**: Ready for deployment with Docker Compose (Node.js, Python, Redis)
-- **Scalable**: Microservice architecture with separate services
-- **Rate Limiting**: Protection against abuse with configurable limits
-- **Comprehensive Logging**: Detailed request logging and error tracking
-- **Swagger Documentation**: Interactive API documentation at `/docs` endpoint
+### Core Functionality
+- **News Verification**: POST endpoint with Redis caching
+- **System Health**: Comprehensive monitoring with rate limiting
+- **Model Metadata**: Version and architecture details
+- **Project Information**: Technology stack and credits
+
+### Technical Features
+- **Microservices Architecture**: Node.js + Python services
+- **Containerized**: Docker Compose ready (Node, Python, Redis)
+- **Rate Limiting**: Protection against abuse
+- **Detailed Logging**: Request/error tracking
+- **Swagger Docs**: Interactive API documentation
+- **Validation**: Input sanitization and validation
+- **Type Safety**: TypeScript interfaces throughout
 
 ## Technical Architecture
 
 ```
-├── API Gateway (Node.js/Express)
-│   ├── Routes
+├── API Gateway (NestJS)
+│   ├── Modules
+│   │   ├── Check - News verification
+│   │   ├── Health - System monitoring  
+│   │   ├── Info - Model metadata
+│   │   └── Shared - Common utilities
 │   ├── Controllers
 │   ├── Services
-│   ├── Middlewares (Rate limiting, Logging)
-│   └── Utils (Text extraction, Python bridge)
+│   ├── Middlewares
+│   └── Pipes/Interceptors
 │
-├── NLP Predictor (Python)
+├── Predictor Service (Python)
 │   ├── LSTM Model (TensorFlow/Keras)
 │   ├── Text Preprocessing (spaCy)
-│   └── Socket Server
+│   └── Socket Server (Threaded)
 │
 └── Redis Cache
-    └── Cached predictions (1-hour TTL)
+    └── Cached predictions
 ```
 
 ## Model Details
 
-The core machine learning model powering this API was personally developed and trained by me (Eric Santos) as part of the [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector) project.
-
 ### Architecture
-```
+
 Input Layer → Embedding Layer (300D) → Bidirectional LSTM (128 units) → 
 Dense Layer (64 units, ReLU) → Output Layer (1 unit, Sigmoid)
-```
 
-### Training Data
-- Source: [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus)
-- Samples: 7,200 news articles (50% real, 50% fake)
-- Train/Test split: 80/20
 
-### Performance Metrics
-| Metric | Value |
-|--------|-------|
-| Accuracy | 95% |
-| Precision | 96% |
-| Recall | 94% |
-| F1-Score | 95% |
-| ROC AUC | 96% |
+### Performance
+| Metric       | Value |
+|--------------|-------|
+| Accuracy     | 95%   |
+| Precision    | 96%   |
+| Recall       | 94%   |
+| F1-Score     | 95%   |
+| ROC AUC      | 96%   |
 
 ### Key Features
-- Custom tokenizer optimized for Brazilian Portuguese
-- Special handling for journalistic vocabulary
-- Adaptive thresholding (default: 0.7 confidence)
-- Redis caching for improved performance
-- Comprehensive health checks
+- Optimized for Brazilian Portuguese
+- Journalistic vocabulary handling
+- Confidence thresholding (0.7 default)
+- Hugging Face Hub integration
+- Efficient text preprocessing
 
 ## API Documentation
 
-Interactive API documentation is automatically generated using Swagger UI and available at `/docs` endpoint when running the service. The documentation includes:
-
-- Detailed endpoint descriptions
-- Example requests/responses
-- Parameter specifications
-- Error codes
-- Rate limit information
+Interactive documentation available at `/docs` when running locally.
 
 ### Endpoints
-
 | Method | Endpoint | Description | Parameters | Rate Limit |
 |--------|----------|-------------|------------|------------|
-| POST   | /check   | Verify news authenticity | `{ "url": "string" }` | 50/15min |
-| GET    | /info    | Get model metadata | - | 100/15min |
-| GET    | /health  | System diagnostics | - | 10/1min |
-| GET    | /credits | Project information | - | 100/15min |
+| POST   | /check   | Verify news | `{ "url": "string" }` | 50/15min |
+| GET    | /info    | Model info  | - | 100/15min |
+| GET    | /health  | System health | - | 10/1min |
 
-Example Request:
+**Example Request:**
 ```bash
 curl -X POST http://localhost:3000/check \
   -H "Content-Type: application/json" \
   -d '{"url":"https://example.com/news-article"}'
 ```
 
-Example Response:
+**Example Response:**
 ```json
 {
   "veracity": "real",
@@ -153,35 +157,26 @@ Example Response:
 - Docker Compose 2.0+
 
 ### Setup
-1. Clone the repository:
 ```bash
 git clone https://github.com/ericshantos/fakeCheck.git
 cd fakeCheck
-```
-
-2. Build and start the services:
-```bash
 docker-compose up --build
 ```
-
-The API will be available at `http://localhost:3000`
+Access API at `http://localhost:3000`
 
 ## Contributing
-
-Contributions are welcome! Please follow these steps:
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin feature/your-feature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/your-feature`)
+3. Commit changes (`git commit -am 'Add feature'`)
+4. Push branch (`git push origin feature/your-feature`)
+5. Open Pull Request
 
 ## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ## Acknowledgments
-- [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus) for the training data
-- [BR Fake News Detector](https://github.com/ericshantos/br_fake_news_detector) - The LSTM model developed by me (Eric Santos) specifically for this project
-- Programadores do Futuro for the educational support
-- TensorFlow/Keras for the deep learning framework
-- Redis for caching implementation
+- [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus) for training data
+- Programadores do Futuro for support
+- TensorFlow/Keras team
+- Redis for caching
+- NestJS framework
