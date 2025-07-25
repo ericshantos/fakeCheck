@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "description": "API that analyzes news content and verifies its veracity using AI.",
   "contact": "ericshantos13@gmail.com",
-  "code_repository": "https://github.com/CheckFake/fakeCheck_API",
+  "code_repository": "https://github.com/ericshantos/fakeCheck_API",
   "technologies": [
     "Node.js",
     "Express",
