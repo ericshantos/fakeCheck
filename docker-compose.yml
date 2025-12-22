@@ -4,7 +4,7 @@ services:
     ports:
       - "6379:6379"
     expose:
-     - "6379"
+      - "6379"
     volumes:
       - redis_data:/data
     networks:
@@ -14,47 +14,42 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  node_app:
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    build:
-      context: ./gateway/
-    container_name: fakecheck_gateway
-    ports:
-      - "3000:3000"
-    expose:
-      - "3000"
-    depends_on:
-      redis: 
-        condition: service_healthy
-      python_service:
-        condition: service_healthy
-    networks:
-      - fakecheck_net
 
   python_service:
-    healthcheck:
-      test: ["CMD-SHELL", "nc -z localhost 9000 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    build:
-      context: ./predictor
+    image: eshantos/veritas_runtime:v2.0
     container_name: fakecheck_predictor
     ports:
       - "9000:9000"
     expose:
       - "9000"
-
     networks:
       - fakecheck_net
+    restart: unless-stopped
+
+  node_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fakecheck_gateway
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    networks:
+      - fakecheck_net
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
 
 networks:
   fakecheck_net:
     driver: bridge
-  
+
 volumes:
   redis_data:
