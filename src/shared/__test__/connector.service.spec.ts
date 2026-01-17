@@ -9,8 +9,7 @@ const wsMock = {
 };
 
 jest.mock('ws', () => ({
-  __esModule: true,
-  default: jest.fn(() => wsMock),
+  WebSocket: jest.fn(() => wsMock),
 }));
 
 import { Test, TestingModule } from '@nestjs/testing';
