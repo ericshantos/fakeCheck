@@ -13,6 +13,7 @@
 A high-performance API for detecting fake news in Portuguese using deep learning, built with NestJS and Python microservices.
 
 ## Table of Contents
+
 - [FakeCheck API v4.1.1](#fakecheck-api-v411)
   - [Table of Contents](#table-of-contents)
   - [Problem Statement](#problem-statement)
