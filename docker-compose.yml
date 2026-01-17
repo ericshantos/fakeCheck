@@ -1,0 +1,29 @@
+services:
+  python_service:
+    image: eshantos/veritas_runtime:v2.2.3
+    container_name: fakecheck_predictor
+    ports:
+      - 9000:9000
+    expose:
+      - 9000
+    networks:
+      - fakecheck_net
+    restart: unless-stopped
+
+  node_app:
+    build: .
+    container_name: fakecheck_gateway
+    ports:
+       - 3000:3000
+    environment:
+      - ENV_NODE=production
+      - PORT=3000
+    networks:
+      - fakecheck_net
+    restart: unless-stopped
+    depends_on:
+      - python_service
+
+networks:
+  fakecheck_net:
+    driver: bridge

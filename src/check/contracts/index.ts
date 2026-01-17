@@ -1,0 +1,1 @@
+export { CheckResponse } from "./check-response.interface";

@@ -1,0 +1,1 @@
+export { CheckService } from "./news-check.service";
