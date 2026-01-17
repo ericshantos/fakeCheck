@@ -1,6 +1,6 @@
 {
   "name": "fake-check_api",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "API that analyzes news content and verifies its veracity using AI.",
   "author": "Eric Santos",
   "private": true,
