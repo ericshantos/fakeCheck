@@ -148,8 +148,8 @@ curl -X POST http://localhost:3000/check \
 
 ### Configuração
 ```bash
-git clone https://github.com/ericshantos/fakeCheck.git
-cd fakeCheck
+git clone https://github.com/ericshantos/fakeCheck_API.git
+cd fakeCheck_API
 docker-compose up --build
 ```
 Acesse a API em `http://localhost:3000`
