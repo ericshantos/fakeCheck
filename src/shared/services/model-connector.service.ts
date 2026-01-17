@@ -1,5 +1,5 @@
 import { Injectable, Inject, Logger } from "@nestjs/common";
-import * as WebSocket from "ws";
+import { WebSocket } from "ws";
 
 import { 
     CONNECTOR_HOST, 
