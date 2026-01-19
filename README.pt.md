@@ -7,7 +7,6 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.19-orange.svg)
 ![Docker & Docker Compose](https://img.shields.io/badge/Docker_&_Compose-enabled-2496ED?logo=docker&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-Cached-red.svg)
 ![NestJS](https://img.shields.io/badge/NestJS-11.0-purple.svg)
 
 API de alta performance para detecção de fake news em português usando deep learning, construída com microserviços NestJS e Python.
@@ -45,13 +44,11 @@ O FakeCheck fornece uma API que:
 2. Processa o conteúdo com pipelines NLP otimizados
 3. Classifica artigos usando nosso modelo LSTM personalizado (95% de acurácia)
 4. Retorna veracidade com score de confiança
-5. Implementa cache Redis com TTL de 1 hora
-6. Oferece monitoramento em tempo real da saúde do sistema
+5. Oferece monitoramento em tempo real da saúde do sistema
 
 ## Funcionalidades
 
 ### Funcionalidades Principais
-- **Verificação de Notícias**: Endpoint POST com cache Redis
 - **Saúde do Sistema**: Monitoramento abrangente
 - **Metadados do Modelo**: Detalhes da versão e arquitetura
 - **Informações do Projeto**: Stack tecnológica e créditos
@@ -79,13 +76,10 @@ O FakeCheck fornece uma API que:
 │   ├── Middlewares
 │   └── Pipes/Interceptores
 │
-├── Serviço de Predição (Python)
-│   ├── Modelo LSTM (TensorFlow/Keras)
-│   ├── Pré-processamento (spaCy)
-│   └── Servidor Socket (Threaded)
-│
-└── Cache Redis
-    └── Predições em cache
+└── Serviço de Predição (Python)
+    ├── Modelo LSTM (TensorFlow/Keras)
+    ├── Pré-processamento (spaCy)
+    └── Servidor Socket (Threaded)
 ```
 
 ## Detalhes do Modelo
@@ -168,7 +162,6 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](./LI
 - [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus) pelos dados de treinamento
 - Programadores do Futuro pelo apoio
 - Equipe TensorFlow/Keras
-- Redis pelo cache
 - Framework NestJS
 ```
 

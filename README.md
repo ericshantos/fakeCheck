@@ -7,7 +7,6 @@
 ![Python](https://img.shields.io/badge/Python-3.10-blue.svg)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.19-orange.svg)
 ![Docker & Docker Compose](https://img.shields.io/badge/Docker_&_Compose-enabled-2496ED?logo=docker&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-Cached-red.svg)
 ![NestJS](https://img.shields.io/badge/NestJS-11.0-purple.svg)
 
 A high-performance API for detecting fake news in Portuguese using deep learning, built with NestJS and Python microservices.
@@ -46,20 +45,18 @@ FakeCheck provides an API that:
 2. Processes content with optimized NLP pipelines
 3. Classifies articles using our custom LSTM model (95% accuracy)
 4. Returns veracity with confidence scoring
-5. Implements Redis caching with 1-hour TTL
-6. Provides real-time system health monitoring
+5. Provides real-time system health monitoring
 
 ## Features
 
 ### Core Functionality
-- **News Verification**: POST endpoint with Redis caching
 - **System Health**: Comprehensive monitoring with rate limiting
 - **Model Metadata**: Version and architecture details
 - **Project Information**: Technology stack and credits
 
 ### Technical Features
 - **Microservices Architecture**: Node.js + Python services
-- **Containerized**: Docker Compose ready (Node, Python, Redis)
+- **Containerized**: Docker Compose ready (Node, Python)
 - **Rate Limiting**: Protection against abuse
 - **Detailed Logging**: Request/error tracking
 - **Swagger Docs**: Interactive API documentation
@@ -80,13 +77,10 @@ FakeCheck provides an API that:
 │   ├── Middlewares
 │   └── Pipes/Interceptors
 │
-├── Predictor Service (Python)
-│   ├── LSTM Model (TensorFlow/Keras)
-│   ├── Text Preprocessing (spaCy)
-│   └── Socket Server (Threaded)
-│
-└── Redis Cache
-    └── Cached predictions
+└── Predictor Service (Python)
+    ├── LSTM Model (TensorFlow/Keras)
+    ├── Text Preprocessing (spaCy)
+    └── Socket Server (Threaded)
 ```
 
 ## Model Details
@@ -169,5 +163,4 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 - [Fake.Br Corpus](https://github.com/roneysco/Fake.br-Corpus) for training data
 - Programadores do Futuro for support
 - TensorFlow/Keras team
-- Redis for caching
 - NestJS framework
